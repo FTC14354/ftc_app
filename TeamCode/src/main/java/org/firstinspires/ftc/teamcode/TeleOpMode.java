@@ -61,7 +61,7 @@ public class TeleOpMode extends OpMode
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        leftMiddliDrive = hardwareMap.get(DcMotor.class, "left_middle_drive");
+        leftMiddleDrive = hardwareMap.get(DcMotor.class, "left_middle_drive");
         rightMiddleDrive = hardwareMap.get(DcMotor.class, "right_middle_drive");
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
