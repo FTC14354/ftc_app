@@ -45,7 +45,8 @@ public class TeleOpMode extends OpMode
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
-
+    private DcMotor rightMiddleDrive= null;
+    private DcMotor leftMiddleDrive= null;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -60,13 +61,16 @@ public class TeleOpMode extends OpMode
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-
+        leftMiddliDrive = hardwareMap.get(DcMotor.class, "left_middle_drive");
+        rightMiddleDrive = hardwareMap.get(DcMotor.class, "right_middle_drive");
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftMiddleDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightMiddleDrive.setDirection(DcMotor.Direction.REVERSE);
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
@@ -122,6 +126,8 @@ public class TeleOpMode extends OpMode
         rightFrontDrive.setPower(rightPower);
         leftBackDrive.setPower(leftPower);
         rightBackDrive.setPower(rightPower);
+        leftMiddleDrive.setPower(leftPower);
+        rightMiddleDrive.setPower(rightPower);
     }
 
     /*
