@@ -48,7 +48,12 @@ public class FourWheelDriveTeleOpMode extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        driveStyle = new FourWheelDriveStyle(hardwareMap, "left_front_drive","right_front_drive", "left_back_drive", "right_back_drive" );
+        driveStyle = new FourWheelDriveStyle(hardwareMap,
+                "left_front_drive",
+                "right_front_drive",
+                "left_back_drive",
+                "right_back_drive" );
+
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
 
@@ -86,7 +91,7 @@ public class FourWheelDriveTeleOpMode extends OpMode
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
         double drive = -gamepad1.left_stick_y;
-        double turn  =  gamepad1.right_stick_x;
+        double turn  =  -gamepad1.right_stick_x;
         leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
         rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
