@@ -35,21 +35,19 @@ public class SampleAuton extends OpMode{
     // Select which camera you want use.  The FRONT camera is the one on the same side as the screen.
     // Valid choices are:  BACK or FRONT
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-
+    double leftPower;
+    double rightPower;
+    VuforiaTrackable blueRover;
+    VuforiaTrackable redFootprint;
+    VuforiaTrackable frontCraters;
+    VuforiaTrackable backSpace;
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
     private VuforiaLocalizer vuforia;
     private List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
     private VuforiaTrackables targetsRoverRuckus;
-
     private DriveStyle driveStyle = null;
-    double leftPower;
-    double rightPower;
 
-    VuforiaTrackable blueRover;
-    VuforiaTrackable redFootprint;
-    VuforiaTrackable frontCraters;
-    VuforiaTrackable backSpace;
     @Override
     public void init() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -224,6 +222,10 @@ public class SampleAuton extends OpMode{
             rightPower = 0.5;
         }
 
+
+
+
+
         // Provide feedback as to where the robot is located (if we know).
         if (targetVisible) {
             telemetry.addData("Visible Target", trackable.getName());
@@ -243,6 +245,16 @@ public class SampleAuton extends OpMode{
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+
+           float y_distance_mm = translation.get(2);
+
+             if (y_distance_mm < 400)
+        {
+                 leftPower = 0.0;
+                 rightPower = 0.0;
+                 targetVisible = true;
+        }
+
         }
         else {
             telemetry.addData("Visible Target", "none");
