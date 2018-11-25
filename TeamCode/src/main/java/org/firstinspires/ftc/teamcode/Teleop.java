@@ -19,10 +19,12 @@ public class Teleop extends OpMode {
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
     private DcMotor intakeMotor = null;
+    private boolean isLiftRunning = false;
 
     @Override
     public void init() {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         telemetry.addData("Status", "Initialized");
@@ -43,10 +45,18 @@ public class Teleop extends OpMode {
     public void loop() {
         if (gamepad1.a) {
             liftMotor.setPower(-0.5);
+            isLiftRunning = true;
         } else if (gamepad1.y) {
             liftMotor.setPower(0.5);
+            isLiftRunning = true;
         } else {
             liftMotor.setPower(0);
+            if (isLiftRunning){
+                telemetry.addData("LiftEncoderValue; ", liftMotor.getCurrentPosition());
+                telemetry.update();
+                isLiftRunning = false;
+            }
+
         }
 
 
@@ -82,9 +92,9 @@ public class Teleop extends OpMode {
 
             driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
 
-            if (gamepad1.x) {
+            if (gamepad1.b) {
                 intakeMotor.setPower(0.5);
-            } else if (gamepad1.b) {
+            } else if (gamepad1.x) {
                 intakeMotor.setPower(-0.5);
             } else {
                 intakeMotor.setPower(0);
