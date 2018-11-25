@@ -1,22 +1,27 @@
 package org.firstinspires.ftc.teamcode;
 
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
 public class Teleop extends OpMode {
 
+    static final double INCREMENT = 0.01;     // amount to ramp motor each CYCLE_MS cycle
+    double leftRampedPower = 0;
+    double rightRampedPower = 0;
+    boolean rampUp = true;
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
     private DcMotor intakeMotor = null;
 
-
     @Override
-    public void init(){
+    public void init() {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
@@ -26,14 +31,16 @@ public class Teleop extends OpMode {
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
-                "right_back_drive" );
+                "right_back_drive");
     }
 
     @Override
-    public void start () { runtime.reset();}
+    public void start() {
+        runtime.reset();
+    }
 
     @Override
-    public void loop () {
+    public void loop() {
         if (gamepad1.a) {
             liftMotor.setPower(-0.5);
         } else if (gamepad1.y) {
@@ -42,6 +49,7 @@ public class Teleop extends OpMode {
             liftMotor.setPower(0);
         }
 
+
         double leftPower;
         double rightPower;
 
@@ -49,23 +57,46 @@ public class Teleop extends OpMode {
         double turn = -gamepad2.right_stick_x;
         leftPower = Range.clip(drive + turn, -1.0, 1.0);
         rightPower = Range.clip(drive - turn, -1.0, 1.0);
-        driveStyle.setDriveValues(leftPower, rightPower);
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
-        if (gamepad1.x) {
-            intakeMotor.setPower (0.5);
-        } else if (gamepad1.b) {
-            intakeMotor.setPower (-0.5);
-        } else {
-            intakeMotor.setPower(0);
+        if (rampUp) {
+            if (leftRampedPower < leftPower) {
+                leftRampedPower += INCREMENT;
+            } else if (leftRampedPower > leftPower) {
+                leftRampedPower -= INCREMENT;
+            }
+            if (rightRampedPower < rightPower) {
+                rightRampedPower += INCREMENT;
+            } else if (rightRampedPower > rightPower) {
+                rightRampedPower -= INCREMENT;
+            }
         }
-    }
+//        telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
+//        telemetry.addData(">", "Press Stop to end test.");
+//        telemetry.update();
+//        telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
+//        telemetry.addData("Status", "Run Time: " + runtime.toString());
+//        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+//
+//        telemetry.addData(">", "Press Start to run Motors.");
+//        telemetry.update();
+
+            driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
+
+            if (gamepad1.x) {
+                intakeMotor.setPower(0.5);
+            } else if (gamepad1.b) {
+                intakeMotor.setPower(-0.5);
+            } else {
+                intakeMotor.setPower(0);
+            }
+        }
+
     @Override
     public void stop() {
         driveStyle.setDriveValues(0, 0);
         intakeMotor.setPower(0);
         liftMotor.setPower(0);
+
     }
 
 }
