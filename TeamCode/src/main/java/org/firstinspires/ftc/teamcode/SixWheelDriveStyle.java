@@ -41,4 +41,13 @@ public class SixWheelDriveStyle implements DriveStyle {
         leftMiddleDrive.setPower(leftPower);
         rightMiddleDrive.setPower(rightPower);
     }
+    @Override
+    public void stop (){
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+        leftMiddleDrive.setPower(0);
+        rightMiddleDrive.setPower(0);
+    }
 }

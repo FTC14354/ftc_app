@@ -13,10 +13,10 @@ public class DeployTheBoi {
     }
     public void doTheThing (){
 //        for(double pos = 0; pos <=1; pos+=.01) {
-            deploymentServo.setPosition(.2);
+            deploymentServo.setPosition(.5);
   //      }
     }
     public void stopDoingThing (){
-        deploymentServo.setPosition(.5);
+        deploymentServo.setPosition(0);
     }
 }
