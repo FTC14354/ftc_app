@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
-import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
+import org.firstinspires.ftc.teamcode.modules.DetectMineral;
+//import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
 @Autonomous (name = "AutonO", group = "Auton opmode")
 public class Auton extends LinearOpMode {
@@ -21,27 +22,36 @@ public class Auton extends LinearOpMode {
                 "left_back_drive",
                 "right_back_drive");
 
-        lowerFromLander();
+        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+
+//        lowerFromLander();
+
+        detectMinerals();
+
+        alignToMineral();
+
+        driveToDepot();
 
         deployTheBoi();
+
+        parkInCrater();
     }
 
 
 
-    private void lowerFromLander() {
-        LowerFromLander lowerFromLander= new LowerFromLander(hardwareMap, driveStyle);
-lowerFromLander.landRobot();
-    }
+//    private void lowerFromLander() {
+//        LowerFromLander lowerFromLander = new LowerFromLander(hardwareMap, driveStyle);
+//lowerFromLander.landRobot();
+//    }
 
     private void detectMinerals() {
-
+        DetectMineral detectMineral = new DetectMineral(telemetry);
     }
 
-    private void alignToMineral() {
+    private void alignToMineral (){
 
     }
-
-    private void sampleMineral() {
+    private void driveToDepot (){
 
     }
 

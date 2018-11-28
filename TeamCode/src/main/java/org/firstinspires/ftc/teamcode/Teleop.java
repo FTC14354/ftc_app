@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
 public class Teleop extends OpMode {
 
-    static final double INCREMENT = 0.01;     // amount to ramp motor each CYCLE_MS cycle
+    static final double INCREMENT = 0.05;     // amount to ramp motor each CYCLE_MS cycle
     double leftRampedPower = 0;
     double rightRampedPower = 0;
     boolean rampUp = true;
@@ -25,6 +25,7 @@ public class Teleop extends OpMode {
     public void init() {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         telemetry.addData("Status", "Initialized");
@@ -42,6 +43,11 @@ public class Teleop extends OpMode {
     }
 
     @Override
+    public void init_loop() {
+        telemetry.addData("status", "loop test... waiting for start");
+    }
+
+    @Override
     public void loop() {
         if (gamepad1.a) {
             liftMotor.setPower(-0.5);
@@ -51,7 +57,7 @@ public class Teleop extends OpMode {
             isLiftRunning = true;
         } else {
             liftMotor.setPower(0);
-            if (isLiftRunning){
+            if (isLiftRunning) {
                 telemetry.addData("LiftEncoderValue; ", liftMotor.getCurrentPosition());
                 telemetry.update();
                 isLiftRunning = false;
@@ -80,6 +86,7 @@ public class Teleop extends OpMode {
                 rightRampedPower -= INCREMENT;
             }
         }
+
 //        telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
 //        telemetry.addData(">", "Press Stop to end test.");
 //        telemetry.update();
@@ -101,12 +108,12 @@ public class Teleop extends OpMode {
             }
         }
 
-    @Override
-    public void stop() {
-        driveStyle.setDriveValues(0, 0);
-        intakeMotor.setPower(0);
-        liftMotor.setPower(0);
+        @Override
+        public void stop () {
+            driveStyle.setDriveValues(0, 0);
+            intakeMotor.setPower(0);
+            liftMotor.setPower(0);
+
+        }
 
     }
-
-}
