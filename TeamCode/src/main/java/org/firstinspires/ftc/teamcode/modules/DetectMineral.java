@@ -12,22 +12,16 @@ public class DetectMineral {
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
 
-    public DetectMineral(Telemetry telemetry) {
+    public DetectMineral(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
+        this.hardwareMap = hardwareMap;
     }
 
     public void ViewAndDetect() {
-        detector = new GoldAlignDetector();
-        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
-        detector.useDefaults();
-        detector.alignSize = 100;
-        detector.alignPosOffset = 0;
-        detector.downscale = 0.4;
-        detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
-        detector.maxAreaScorer.weight = 0.005;
-        detector.ratioScorer.weight = 5;
-        detector.ratioScorer.perfectRatio = 1.0;
-        detector.enable();
+
+
+    }
+    public void Telemetry (){
         telemetry.addData("IsAligned", detector.getAligned()); // Is the bot aligned with the gold mineral?
         telemetry.addData("X Pos", detector.getXPosition());
     }
