@@ -18,6 +18,7 @@ public class Auton extends LinearOpMode {
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
+    private final double DRIVE_MOTOR_MAX = 0.8;
 
     public void runOpMode() {
         waitForStart();
@@ -66,13 +67,16 @@ public class Auton extends LinearOpMode {
     private void alignToMineral(GoldAlignDetector detector) {
         while (opModeIsActive() && !detector.getAligned()) {
             double x = detector.getXPosition();
+            telemetry.addData("detector X Position:", x);
             if (x < 320) {
-                driveStyle.setDriveValues(.8, -.8);
+
+                driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
             } else {
-                driveStyle.setDriveValues(-.8, .8);
+                driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
             }
 
-            driveStyle.setDriveValues(-1, -1);
+            driveStyle.driveToPosition(1400);
+            //driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
         }
     }
 

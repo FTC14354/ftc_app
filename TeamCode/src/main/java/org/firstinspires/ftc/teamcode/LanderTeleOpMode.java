@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp (name = "LanderTeleOpMode", group = "TeleOp opmode")
+@Disabled
 public class LanderTeleOpMode extends OpMode
 {
     private DcMotor liftMotor = null;
