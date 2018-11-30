@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 import org.firstinspires.ftc.teamcode.modules.DetectMineral;
 import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
-@Autonomous (name = "AutonO", group = "Auton opmode")
+@Autonomous(name = "AutonO", group = "Auton opmode")
 public class Auton extends LinearOpMode {
 
     private DcMotor liftMotor;
@@ -42,40 +42,41 @@ public class Auton extends LinearOpMode {
 
         parkInCrater();
     }
-private GoldAlignDetector initMineralDetector (){
-    GoldAlignDetector detector = new GoldAlignDetector();
-    detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
-    detector.useDefaults();
-    detector.alignSize = 100;
-    detector.alignPosOffset = 0;
-    detector.downscale = 0.4;
-    detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
-    detector.maxAreaScorer.weight = 0.005;
-    detector.ratioScorer.weight = 5;
-    detector.ratioScorer.perfectRatio = 1.0;
-    detector.enable();
-return detector;
-}
+
+    private GoldAlignDetector initMineralDetector() {
+        GoldAlignDetector detector = new GoldAlignDetector();
+        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
+        detector.useDefaults();
+        detector.alignSize = 100;
+        detector.alignPosOffset = 0;
+        detector.downscale = 0.4;
+        detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
+        detector.maxAreaScorer.weight = 0.005;
+        detector.ratioScorer.weight = 5;
+        detector.ratioScorer.perfectRatio = 1.0;
+        detector.enable();
+        return detector;
+    }
 
 //    private void lowerFromLander() {
 //        LowerFromLander lowerFromLander = new LowerFromLander(hardwareMap, driveStyle);
 //        lowerFromLander.landRobot();
 //    }
 
-    private void alignToMineral (GoldAlignDetector detector){
-        while (opModeIsActive() && !detector.getAligned()){
+    private void alignToMineral(GoldAlignDetector detector) {
+        while (opModeIsActive() && !detector.getAligned()) {
             double x = detector.getXPosition();
             if (x < 320) {
                 driveStyle.setDriveValues(.8, -.8);
-            }
-            else {
+            } else {
                 driveStyle.setDriveValues(-.8, .8);
             }
 
-            driveStyle.setDriveValues (-1,-1);
+            driveStyle.setDriveValues(-1, -1);
         }
     }
-    private void driveToDepot (){
+
+    private void driveToDepot() {
 
     }
 

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
 public class Teleop extends OpMode {
-
+    static final double LIFT_MAX_POWER = 0.8;
     static final double INCREMENT = 0.05;     // amount to ramp motor each CYCLE_MS cycle
     double leftRampedPower = 0;
     double rightRampedPower = 0;
@@ -50,10 +50,10 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.a) {
-            liftMotor.setPower(-0.5);
+            liftMotor.setPower(-LIFT_MAX_POWER);
             isLiftRunning = true;
         } else if (gamepad1.y) {
-            liftMotor.setPower(0.5);
+            liftMotor.setPower(LIFT_MAX_POWER);
             isLiftRunning = true;
         } else {
             liftMotor.setPower(0);
@@ -62,9 +62,7 @@ public class Teleop extends OpMode {
                 telemetry.update();
                 isLiftRunning = false;
             }
-
         }
-
 
         double leftPower;
         double rightPower;
@@ -88,32 +86,27 @@ public class Teleop extends OpMode {
         }
 
         telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
-        telemetry.addData(">", "Press Stop to end test.");
-        telemetry.update();
         telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 
-        telemetry.addData(">", "Press Start to run Motors.");
         telemetry.update();
 
-            driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
+        driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
 
-            if (gamepad1.b) {
-                intakeMotor.setPower(0.5);
-            } else if (gamepad1.x) {
-                intakeMotor.setPower(-0.5);
-            } else {
-                intakeMotor.setPower(0);
-            }
-        }
-
-        @Override
-        public void stop () {
-            driveStyle.setDriveValues(0, 0);
+        if (gamepad1.b) {
+            intakeMotor.setPower(0.5);
+        } else if (gamepad1.x) {
+            intakeMotor.setPower(-0.5);
+        } else {
             intakeMotor.setPower(0);
-            liftMotor.setPower(0);
-
         }
-
     }
+
+    @Override
+    public void stop() {
+        driveStyle.setDriveValues(0, 0);
+        intakeMotor.setPower(0);
+        liftMotor.setPower(0);
+    }
+}
