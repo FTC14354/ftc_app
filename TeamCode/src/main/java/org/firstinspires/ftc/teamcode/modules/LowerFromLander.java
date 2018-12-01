@@ -26,7 +26,7 @@ public class LowerFromLander {
     public void landRobot() {
         lowerRobot();
         driveForward();
-        //lowerArm();
+        lowerArm();
     }
 
     public void lowerRobot() {

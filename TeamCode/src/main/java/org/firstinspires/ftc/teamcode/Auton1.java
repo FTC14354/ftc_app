@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
@@ -13,13 +12,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
-@Autonomous(name = "AutonO", group = "Auton opmode")
-public class Auton extends LinearOpMode {
+
+@Autonomous(name = "Auton1", group = "Auton opmode")
+public class Auton1 extends LinearOpMode {
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
@@ -27,7 +25,7 @@ public class Auton extends LinearOpMode {
     private BNO055IMU imu;
 
     public void runOpMode() {
-        while (!opModeIsActive()&&!isStopRequested()) {
+        while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Status", "Waiting in Init");
             telemetry.update();
         }
@@ -49,11 +47,11 @@ public class Auton extends LinearOpMode {
 
         lowerFromLander();
 
-        /*
+
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
-
+/*
         driveToDepot();
 
         deployTheBoi();
@@ -86,29 +84,28 @@ public class Auton extends LinearOpMode {
         boolean abort = false;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
 
         while (opModeIsActive() && !abort && !detector.getAligned()) {
-            double x = detector.getXPosition();
-            telemetry.addData("detector X Position:", x);
+
 
             int dir = 0;
 
-            while(opModeIsActive() && !abort && !detector.isFound()) {
+            while (opModeIsActive() && !abort && !detector.isFound()) {
                 float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 telemetry.addData("currentAngle:", currentAngle);
                 telemetry.update();
-                if(dir == 0 && currentAngle < 35) {
+                if (dir == 0 && currentAngle < 35) {
                     driveStyle.setDriveValues(.5, -.5);
                 } else {
-                    dir=1;
-                    if(currentAngle > -35){
+                    dir = 1;
+                    if (currentAngle > -35) {
                         driveStyle.setDriveValues(-.5, .5);
                     } else {
                         abort = true;
@@ -119,6 +116,20 @@ public class Auton extends LinearOpMode {
             telemetry.update();
             driveStyle.stop();
 
+            if (opModeIsActive() && detector.isFound()) {
+                double x = detector.getXPosition();
+                telemetry.addData("detector X Position:", x);
+                if (!detector.getAligned()) {
+
+                    if (x < 270) {
+                        driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
+                    } else if (x > 370) {
+                        driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+                    }
+
+                }
+
+            }
 //            if (detector.isFound()) {
 //                if (x < 320) {
 //                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
@@ -126,7 +137,7 @@ public class Auton extends LinearOpMode {
 //                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
 //                }
 
-               // driveStyle.driveToPosition(1400);
+            // driveStyle.driveToPosition(1400);
 //            }
         }
     }
@@ -135,19 +146,21 @@ public class Auton extends LinearOpMode {
 
     }
 
-    private void deployTheBoi() {
-        DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
-        boiDeployer.doTheThing();
-        idle();
-        sleep(2000);
-        idle();
-        boiDeployer.stopDoingThing();
-        sleep(2000);
-        idle();
-    }
+//    private void deployTheBoi() {
+//        DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
+//        boiDeployer.doTheThing();
+//        idle();
+//        sleep(2000);
+//        idle();
+//        boiDeployer.stopDoingThing();
+//        sleep(2000);
+//        idle();
+//    }
 
     private void parkInCrater() {
 
     }
 
 }
+
+
