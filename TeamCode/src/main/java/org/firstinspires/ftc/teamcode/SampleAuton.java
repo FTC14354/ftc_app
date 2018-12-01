@@ -79,6 +79,7 @@ public class SampleAuton extends OpMode{
         allTrackables.addAll(targetsRoverRuckus);
 
         driveStyle = new FourWheelDriveStyle(hardwareMap,
+                telemetry,
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",

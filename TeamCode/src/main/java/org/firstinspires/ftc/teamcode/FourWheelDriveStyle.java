@@ -3,21 +3,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class FourWheelDriveStyle implements DriveStyle {
-    private HardwareMap hardwareMap = null;
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
-    private DcMotor rightMiddleDrive = null;
-    private DcMotor leftMiddleDrive = null;
+    private Telemetry telemetry;
 
     public FourWheelDriveStyle() {
         // Do Nothing
     }
 
-    public FourWheelDriveStyle(HardwareMap hardwareMap, String leftFrontDriveName, String rightFrontDriveName, String leftBackDriveName, String rightBackDriveName) {
-
+    public FourWheelDriveStyle(HardwareMap hardwareMap, Telemetry telemetry, String leftFrontDriveName, String rightFrontDriveName, String leftBackDriveName, String rightBackDriveName) {
         leftFrontDrive = hardwareMap.get(DcMotor.class, leftFrontDriveName);
         rightFrontDrive = hardwareMap.get(DcMotor.class, rightFrontDriveName);
         leftBackDrive = hardwareMap.get(DcMotor.class, leftBackDriveName);
@@ -27,6 +26,8 @@ public class FourWheelDriveStyle implements DriveStyle {
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -42,5 +43,23 @@ public class FourWheelDriveStyle implements DriveStyle {
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    @Override
+    public void driveToPosition(int encoderTicks) {
+        telemetry.addData("Current position",
+                String.format("lf: %s, lb: %s",
+                        leftFrontDrive.getCurrentPosition(),
+                        leftBackDrive.getCurrentPosition()));
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftFrontDrive.setTargetPosition(encoderTicks);
+        leftBackDrive.setTargetPosition(encoderTicks);
+
+        leftFrontDrive.setPower(.5);
+        leftBackDrive.setPower(.5);
+
     }
 }

@@ -29,12 +29,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="4WD Iterative OpMode", group="Iterative Opmode")
+@Disabled
 public class FourWheelDriveTeleOpMode extends OpMode
 {
     // Declare OpMode members.
@@ -49,6 +51,7 @@ public class FourWheelDriveTeleOpMode extends OpMode
         telemetry.addData("Status", "Initialized");
 
         driveStyle = new FourWheelDriveStyle(hardwareMap,
+                telemetry,
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",

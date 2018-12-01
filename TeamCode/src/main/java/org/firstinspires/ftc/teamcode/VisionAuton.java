@@ -32,19 +32,15 @@ package org.firstinspires.ftc.teamcode;
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
-import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(name="GoldAlign Example", group="DogeCV")
-
 public class VisionAuton extends OpMode
 {
     // Detector object
     private GoldAlignDetector detector;
-    private FourWheelDriveStyle driving;
-
 
     @Override
     public void init() {
@@ -68,12 +64,6 @@ public class VisionAuton extends OpMode
         detector.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
 
         detector.enable(); // Start the detector!
-
-        driving = new FourWheelDriveStyle(hardwareMap,
-                "left_front_drive",
-                "right_front_drive",
-                "left_back_drive",
-                "right_back_drive" );
     }
 
     /*
@@ -108,5 +98,4 @@ public class VisionAuton extends OpMode
         // Disable the detector
         detector.disable();
     }
-
 }

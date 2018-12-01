@@ -8,10 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
-import org.firstinspires.ftc.teamcode.modules.DetectMineral;
-import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
 @Autonomous(name = "AutonO", group = "Auton opmode")
 public class Auton extends LinearOpMode {
@@ -21,9 +18,13 @@ public class Auton extends LinearOpMode {
     private final double DRIVE_MOTOR_MAX = 0.8;
 
     public void runOpMode() {
-        waitForStart();
-        telemetry.addLine("turnLeft, turnRight");
+        while (!opModeIsActive()&&!isStopRequested()) {
+            telemetry.addData("Status", "Waiting in Init");
+            telemetry.update();
+        }
+
         driveStyle = new FourWheelDriveStyle(hardwareMap,
+                telemetry,
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
@@ -68,15 +69,17 @@ public class Auton extends LinearOpMode {
         while (opModeIsActive() && !detector.getAligned()) {
             double x = detector.getXPosition();
             telemetry.addData("detector X Position:", x);
-            if (x < 320) {
 
-                driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-            } else {
-                driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+            if (detector.isFound()) {
+                if (x < 320) {
+
+                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
+                } else {
+                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+                }
+
+                driveStyle.driveToPosition(1400);
             }
-
-            driveStyle.driveToPosition(1400);
-            //driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
         }
     }
 

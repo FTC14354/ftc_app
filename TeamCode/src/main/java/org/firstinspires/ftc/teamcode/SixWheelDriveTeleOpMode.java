@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="6WD Iterative OpMode", group="Iterative Opmode")
+@Disabled
 public class SixWheelDriveTeleOpMode extends OpMode
 {
     // Declare OpMode members.

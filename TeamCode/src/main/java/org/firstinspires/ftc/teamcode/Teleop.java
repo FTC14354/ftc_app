@@ -31,6 +31,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Status", "Initialized");
 
         driveStyle = new FourWheelDriveStyle(hardwareMap,
+                telemetry,
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
