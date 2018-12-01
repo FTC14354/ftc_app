@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
+
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
 public class Teleop extends OpMode {
     static final double LIFT_MAX_POWER = 0.8;
@@ -21,8 +23,12 @@ public class Teleop extends OpMode {
     private DcMotor intakeMotor = null;
     private boolean isLiftRunning = false;
 
+    private DeployTheBoi boiDeployer;
+
+
     @Override
     public void init() {
+        boiDeployer = new DeployTheBoi(hardwareMap);
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -101,6 +107,13 @@ public class Teleop extends OpMode {
             intakeMotor.setPower(-0.5);
         } else {
             intakeMotor.setPower(0);
+        }
+
+        if (gamepad1.left_bumper) {
+            boiDeployer.sweep();
+            if(gamepad1.right_bumper) {
+                boiDeployer.logPosition();
+            }
         }
     }
 
