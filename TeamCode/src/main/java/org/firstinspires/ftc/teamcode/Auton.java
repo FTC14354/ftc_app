@@ -47,10 +47,9 @@ public class Auton extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        lowerFromLander();
 
-//
-//        lowerFromLander();
-
+        /*
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
@@ -60,6 +59,7 @@ public class Auton extends LinearOpMode {
         deployTheBoi();
 
         parkInCrater();
+        */
     }
 
     private GoldAlignDetector initMineralDetector() {

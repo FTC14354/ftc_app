@@ -13,7 +13,7 @@ public class LowerFromLander {
     private HardwareMap hardwareMap;
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
-    private final static int encoder_ticks_top_released = 18985;
+    private final static int encoder_ticks_top_released = 16800;
     private final static int encoder_ticks_lowered = 10000;
     private final static double POWER_MAX = 0.5;
 
@@ -26,7 +26,7 @@ public class LowerFromLander {
     public void landRobot() {
         lowerRobot();
         driveForward();
-        lowerArm();
+        //lowerArm();
     }
 
     public void lowerRobot() {
@@ -34,8 +34,8 @@ public class LowerFromLander {
     }
 
     public void driveForward() {
-        driveStyle.setDriveValues(POWER_MAX, POWER_MAX);
-        sleep(500);
+        driveStyle.setDriveValues(-POWER_MAX, -POWER_MAX);
+        sleep(200);
         driveStyle.stop();
 
     }
