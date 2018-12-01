@@ -20,7 +20,8 @@ public class EncoderOpMode extends LinearOpMode {
                 "right_back_drive");
 
         if (opModeIsActive()) {
-            driveStyle.driveToPosition(2240);
+            driveStyle.driveToPosition(1120);
+            sleep(4000);
         }
     }
 }

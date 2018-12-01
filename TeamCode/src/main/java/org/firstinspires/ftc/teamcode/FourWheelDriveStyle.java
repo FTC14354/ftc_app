@@ -47,19 +47,53 @@ public class FourWheelDriveStyle implements DriveStyle {
 
     @Override
     public void driveToPosition(int encoderTicks) {
-        telemetry.addData("Current position",
-                String.format("lf: %s, lb: %s",
-                        leftFrontDrive.getCurrentPosition(),
-                        leftBackDrive.getCurrentPosition()));
+//        telemetry.addData("Current position",
+//                String.format("lf: %s, lb: %s, rb: %s, rf: %s",
+//                        leftFrontDrive.getCurrentPosition(),
+//                        leftBackDrive.getCurrentPosition()),
+//                        rightBackDrive.getCurrentPosition(),
+//                        rightFrontDrive.getCurrentPosition());
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setTargetPosition(encoderTicks);
-        leftBackDrive.setTargetPosition(encoderTicks);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+//        leftFrontDrive.setTargetPosition(encoderTicks);
+//        leftBackDrive.setTargetPosition(encoderTicks);
+//        rightFrontDrive.setTargetPosition(encoderTicks);
+//        rightBackDrive.setTargetPosition(encoderTicks);
+//
+//
+//        leftFrontDrive.setTargetPosition(encoderTicks);
+//        leftBackDrive.setTargetPosition(encoderTicks);
+//        rightFrontDrive.setTargetPosition(encoderTicks);
+//        rightBackDrive.setTargetPosition(encoderTicks);
+//
+//        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftFrontDrive.setPower(.5);
         leftBackDrive.setPower(.5);
+        rightFrontDrive.setPower(.5);
+        rightBackDrive.setPower(.5);
+
+        while (Math.abs(leftBackDrive.getCurrentPosition()) < encoderTicks) {
+
+            telemetry.addData("leftBackDrive: ", leftBackDrive.getCurrentPosition());
+            telemetry.update();
+        }
+        leftFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        rightBackDrive.setPower(0);
 
     }
 }
