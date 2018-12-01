@@ -14,7 +14,8 @@ public class LowerFromLander {
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
     private final static int encoder_ticks_top_released = 18985;
-    private final static double POWER_MAX = 0.7;
+    private final static int encoder_ticks_lowered = 10000;
+    private final static double POWER_MAX = 0.5;
 
     public LowerFromLander(HardwareMap hardwareMap, DriveStyle drivestyle) {
         this.hardwareMap = hardwareMap;
@@ -29,29 +30,28 @@ public class LowerFromLander {
     }
 
     public void lowerRobot() {
-        moveMotorToPosition(liftMotor, encoder_ticks_top_released, Direction.FORWARD);
+        moveMotorToPosition(encoder_ticks_top_released);
     }
 
     public void driveForward() {
         driveStyle.setDriveValues(POWER_MAX, POWER_MAX);
-        sleep(1000);
+        sleep(500);
         driveStyle.stop();
 
     }
 
     public void lowerArm() {
-        moveMotorToPosition(liftMotor, encoder_ticks_top_released, Direction.REVERSE);
-
-
+        moveMotorToPosition(encoder_ticks_lowered);
     }
 
-    private void moveMotorToPosition(DcMotor motor, int position, Direction direction) {
-        liftMotor.setDirection(direction);
+    private void moveMotorToPosition(int position) {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftMotor.setTargetPosition(position);
-        while (liftMotor.isBusy()) {
+        liftMotor.setPower(.5);
 
+        while (liftMotor.isBusy()) {
+            sleep(500);
         }
         liftMotor.setPower(0);
     }
