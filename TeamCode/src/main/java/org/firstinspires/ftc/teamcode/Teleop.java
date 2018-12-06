@@ -16,7 +16,7 @@ public class Teleop extends OpMode {
     static final double INCREMENT = 0.05;     // amount to ramp motor each CYCLE_MS cycle
     double leftRampedPower = 0;
     double rightRampedPower = 0;
-    boolean rampUp = true;
+    boolean rampUp = false;
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
@@ -79,6 +79,12 @@ public class Teleop extends OpMode {
         leftPower = Range.clip(drive + turn, -1.0, 1.0);
         rightPower = Range.clip(drive - turn, -1.0, 1.0);
 
+
+        if (gamepad2.left_trigger > 0.0) {
+            rampUp = true;
+        } else{
+            rampUp = false;
+        }
         if (rampUp) {
             if (leftRampedPower < leftPower) {
                 leftRampedPower += INCREMENT;
@@ -90,6 +96,9 @@ public class Teleop extends OpMode {
             } else if (rightRampedPower > rightPower) {
                 rightRampedPower -= INCREMENT;
             }
+        }else {
+            leftRampedPower = leftPower;
+            rightRampedPower = rightPower;
         }
 
         telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
@@ -101,18 +110,29 @@ public class Teleop extends OpMode {
 
         driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
 
-        if (gamepad1.b) {
+        if (gamepad1.b)
+
+        {
             intakeMotor.setPower(0.5);
-        } else if (gamepad1.x) {
+        } else if (gamepad1.x)
+
+        {
             intakeMotor.setPower(-0.5);
-        } else {
+        } else
+
+        {
             intakeMotor.setPower(0);
         }
 
-        if (gamepad1.left_bumper) {
+        if (gamepad1.left_bumper)
+
+        {
             boiDeployer.sweep();
-            if(gamepad1.right_bumper) {
+            if (gamepad1.right_bumper) {
                 boiDeployer.logPosition();
+            }
+            else {
+                boiDeployer.stopDoingThing();
             }
         }
     }
@@ -123,4 +143,6 @@ public class Teleop extends OpMode {
         intakeMotor.setPower(0);
         liftMotor.setPower(0);
     }
+
+
 }

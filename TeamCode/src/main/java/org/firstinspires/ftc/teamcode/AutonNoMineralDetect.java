@@ -8,35 +8,26 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
-import java.io.File;
 
-
-@Autonomous(name = "AutonDepot", group = "Auton opmode")
-public class AutonDepot extends LinearOpMode {
+@Autonomous(name = "AutonCrater", group = "Auton opmode")
+public class AutonNoMineralDetect extends LinearOpMode {
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
     private final double DRIVE_MOTOR_MAX = 0.8;
     private BNO055IMU imu;
-    private File file;
 
     public void runOpMode() {
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Status", "Waiting in Init");
             telemetry.update();
         }
-
-        String filename = "sweepLog.log";
-        file = AppUtil.getInstance().getSettingsFile(filename);
 
         driveStyle = new FourWheelDriveStyle(hardwareMap,
                 telemetry,
@@ -56,9 +47,9 @@ public class AutonDepot extends LinearOpMode {
         lowerFromLander();
 
 
-        GoldAlignDetector detector = initMineralDetector();
+     //   GoldAlignDetector detector = initMineralDetector();
 
-        alignToMineral(detector);
+     //   alignToMineral(detector);
 /*
         driveToDepot();
 
@@ -69,7 +60,6 @@ public class AutonDepot extends LinearOpMode {
     }
 
     private GoldAlignDetector initMineralDetector() {
-        ReadWriteFile.writeFile(file, "Starting initMineralDetector\n");
         GoldAlignDetector detector = new GoldAlignDetector();
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.useDefaults();
@@ -81,7 +71,6 @@ public class AutonDepot extends LinearOpMode {
         detector.ratioScorer.weight = 5;
         detector.ratioScorer.perfectRatio = 1.0;
         detector.enable();
-        ReadWriteFile.writeFile(file, "Leaving initMineralDetector\n");
         return detector;
     }
 
@@ -92,7 +81,6 @@ public class AutonDepot extends LinearOpMode {
 
     private void alignToMineral(GoldAlignDetector detector) {
         boolean abort = false;
-        ReadWriteFile.writeFile(file, "Starting alignToMineral\n");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -102,7 +90,6 @@ public class AutonDepot extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
-        ReadWriteFile.writeFile(file, "imu init complete\n");
 
         while (opModeIsActive() && !abort && !detector.getAligned()) {
 
@@ -124,8 +111,6 @@ public class AutonDepot extends LinearOpMode {
                     }
                 }
             }
-            ReadWriteFile.writeFile(file, "Scanning complete\n");
-
             telemetry.addLine().addData("Finished scanning abort is ", abort);
             telemetry.update();
             driveStyle.stop();
@@ -134,7 +119,6 @@ public class AutonDepot extends LinearOpMode {
                 double x = detector.getXPosition();
                 telemetry.addData("detector X Position:", x);
                 if (!detector.getAligned()) {
-
 
                     if (x < 270) {
                         driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
@@ -146,26 +130,29 @@ public class AutonDepot extends LinearOpMode {
 
             }
             driveStyle.driveToPosition(1400);
+
         }
-        ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort +"\n");
     }
 
-//        private void driveToDepot () {
-//
-//        }
-
-        private void deployTheBoi(){
-            DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
-            boiDeployer.doTheThing();
-            idle();
-            sleep(2000);
-            idle();
-            boiDeployer.stopDoingThing();
-            sleep(2000);
-            idle();
-        }
-
+    private void driveToDepot() {
 
     }
+
+//    private void deployTheBoi() {
+//        DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
+//        boiDeployer.doTheThing();
+//        idle();
+//        sleep(2000);
+//        idle();
+//        boiDeployer.stopDoingThing();
+//        sleep(2000);
+//        idle();
+//    }
+
+    private void parkInCrater() {
+
+    }
+
+}
 
 
