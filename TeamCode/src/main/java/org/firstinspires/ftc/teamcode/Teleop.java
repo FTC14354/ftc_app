@@ -20,9 +20,8 @@ public class Teleop extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
-    private DcMotor intakeMotor = null;
     private boolean isLiftRunning = false;
-
+    private Intake intake;
     private DeployTheBoi boiDeployer;
 
 
@@ -32,7 +31,7 @@ public class Teleop extends OpMode {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+
 
         telemetry.addData("Status", "Initialized");
 
@@ -42,6 +41,8 @@ public class Teleop extends OpMode {
                 "right_front_drive",
                 "left_back_drive",
                 "right_back_drive");
+
+        intake = new DcMotorIntake(hardwareMap);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class Teleop extends OpMode {
 
         if (gamepad2.left_trigger > 0.0) {
             rampUp = true;
-        } else{
+        } else {
             rampUp = false;
         }
         if (rampUp) {
@@ -96,7 +97,7 @@ public class Teleop extends OpMode {
             } else if (rightRampedPower > rightPower) {
                 rightRampedPower -= INCREMENT;
             }
-        }else {
+        } else {
             leftRampedPower = leftPower;
             rightRampedPower = rightPower;
         }
@@ -110,18 +111,26 @@ public class Teleop extends OpMode {
 
         driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
 
-        if (gamepad1.b)
+        if (gamepad1.left_bumper) {
+            intake.retract();
 
-        {
-            intakeMotor.setPower(0.5);
-        } else if (gamepad1.x)
+        } else if (gamepad2.right_bumper) {
+            intake.extend();
 
-        {
-            intakeMotor.setPower(-0.5);
-        } else
+        } else {
+            intake.stop();
 
-        {
-            intakeMotor.setPower(0);
+        }
+
+        if (gamepad1.b) {
+            intake.purge();
+
+        } else if (gamepad1.x) {
+            intake.binge();
+
+        } else {
+            intake.stop();
+
         }
 
         if (gamepad1.left_bumper)
@@ -130,8 +139,7 @@ public class Teleop extends OpMode {
             boiDeployer.sweep();
             if (gamepad1.right_bumper) {
                 boiDeployer.logPosition();
-            }
-            else {
+            } else {
                 boiDeployer.stopDoingThing();
             }
         }
@@ -140,7 +148,7 @@ public class Teleop extends OpMode {
     @Override
     public void stop() {
         driveStyle.setDriveValues(0, 0);
-        intakeMotor.setPower(0);
+        intake.stop();
         liftMotor.setPower(0);
     }
 
