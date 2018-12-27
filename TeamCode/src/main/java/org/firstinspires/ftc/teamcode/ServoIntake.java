@@ -16,6 +16,7 @@ public class ServoIntake implements Intake {
     private final Integer SHOULDER_STOP = 0;
     private final Integer ELBOW_STOP = 0;
 
+
     public ServoIntake(HardwareMap hardwareMap) {
         intakeServo = hardwareMap.get(CRServo.class, "intakeServo");
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");

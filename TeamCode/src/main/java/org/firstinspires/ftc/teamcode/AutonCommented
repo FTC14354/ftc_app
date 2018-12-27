@@ -16,7 +16,7 @@
 //import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 //
 //
-//@Autonomous(name = "AutonCrater", group = "Auton opmode")
+//@Autonomous(name = "AutonCommented", group = "Auton opmode")
 //public class Auton1 extends LinearOpMode {
 //
 //    private DcMotor liftMotor;

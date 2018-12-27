@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Func;
 
 @TeleOp(name = "TESTTeleOpMode", group = "TeleOp opmode")
 public class TestTelop extends OpMode {
-    private static final double STEP_SIZE = 5;
+    private static final double STEP_SIZE = 0.02;
     private Servo elbowServo;
     private Servo shoulderServo;
 
@@ -17,6 +17,8 @@ public class TestTelop extends OpMode {
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         shoulderServo = hardwareMap.get(Servo.class, "shoulderServo");
         composeTelemetry();
+        elbowServo.setPosition(0);
+        shoulderServo.setPosition(0);
     }
 
     private void composeTelemetry() {
@@ -39,16 +41,19 @@ public class TestTelop extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad2.a) {
-            elbowServo.setPosition(elbowServo.getPosition() + STEP_SIZE);
-        } else if (gamepad2.y) {
-            elbowServo.setPosition(elbowServo.getPosition() - STEP_SIZE);
+        double currentElbowPosition = elbowServo.getPosition();
+        double currentShoulderPosition = shoulderServo.getPosition();
 
-        } else if (gamepad2.x) {
-            shoulderServo.setPosition(shoulderServo.getPosition() + STEP_SIZE);
+        if (gamepad2.a && currentElbowPosition + STEP_SIZE < 1) {
+            elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
+        } else if (gamepad2.y && currentElbowPosition - STEP_SIZE > 0) {
+            elbowServo.setPosition(currentElbowPosition - STEP_SIZE);
 
-        } else if (gamepad2.b) {
-            shoulderServo.setPosition(shoulderServo.getPosition() + STEP_SIZE);
+        } else if (gamepad2.x && currentShoulderPosition + STEP_SIZE < 1) {
+            shoulderServo.setPosition(currentShoulderPosition + STEP_SIZE);
+
+        } else if (gamepad2.b && currentShoulderPosition - STEP_SIZE > 0) {
+            shoulderServo.setPosition(currentShoulderPosition - STEP_SIZE);
         }
         telemetry.update();
     }
