@@ -29,7 +29,7 @@ public class AutonDepot extends LinearOpMode {
     private BNO055IMU imu;
     private File file;
 
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Status", "Waiting in Init");
             telemetry.update();
@@ -53,7 +53,7 @@ public class AutonDepot extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lowerFromLander();
+//        lowerFromLander();
 
 
         GoldAlignDetector detector = initMineralDetector();
@@ -90,7 +90,7 @@ public class AutonDepot extends LinearOpMode {
         lowerFromLander.landRobot();
     }
 
-    private void alignToMineral(GoldAlignDetector detector) {
+    private void alignToMineral(GoldAlignDetector detector) throws InterruptedException {
         boolean abort = false;
         ReadWriteFile.writeFile(file, "Starting alignToMineral\n");
 
@@ -108,7 +108,6 @@ public class AutonDepot extends LinearOpMode {
 
 
             int dir = 0;
-
             while (opModeIsActive() && !abort && !detector.isFound()) {
                 float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 telemetry.addData("currentAngle:", currentAngle);
@@ -145,27 +144,29 @@ public class AutonDepot extends LinearOpMode {
                 }
 
             }
-            driveStyle.driveToPosition(1400);
+            driveStyle.setDriveValues(-.8, -.8);
+            wait(1000);
+            driveStyle.setDriveValues(0,0);
         }
-        ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort +"\n");
+        ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
     }
 
 //        private void driveToDepot () {
 //
 //        }
 
-        private void deployTheBoi(){
-            DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
-            boiDeployer.doTheThing();
-            idle();
-            sleep(2000);
-            idle();
-            boiDeployer.stopDoingThing();
-            sleep(2000);
-            idle();
-        }
-
-
+    private void deployTheBoi() {
+        DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
+        boiDeployer.doTheThing();
+        idle();
+        sleep(2000);
+        idle();
+        boiDeployer.stopDoingThing();
+        sleep(2000);
+        idle();
     }
+
+
+}
 
 
