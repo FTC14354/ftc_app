@@ -59,13 +59,13 @@ public class AutonDepot extends LinearOpMode {
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
-/*
-        driveToDepot();
+
+//        driveToDepot();
 
         deployTheBoi();
 
-        parkInCrater();
-        */
+//        parkInCrater();
+
     }
 
     private GoldAlignDetector initMineralDetector() {
@@ -135,19 +135,17 @@ public class AutonDepot extends LinearOpMode {
                 if (!detector.getAligned()) {
 
 
-                    if (x < 270) {
+                    if (x < 290) {
                         driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-                    } else if (x > 370) {
+                    } else if (x > 350) {
                         driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
                     }
-
                 }
 
             }
-            driveStyle.setDriveValues(-.8, -.8);
-            wait(1000);
-            driveStyle.setDriveValues(0,0);
+            driveStyle.setDriveValues(-.8,-.8);
         }
+
         ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
     }
 
