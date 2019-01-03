@@ -1,0 +1,172 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.ReadWriteFile;
+
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
+
+import java.io.File;
+
+@TeleOp(name = "Insturmental", group = "TeleOp opmode")
+public class instrumentation extends OpMode {
+
+
+    static final double LIFT_MAX_POWER = 0.8;
+    static final double INCREMENT = 0.05;     // amount to ramp motor each CYCLE_MS cycle
+    double leftRampedPower = 0;
+    double rightRampedPower = 0;
+    boolean rampUp = false;
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor liftMotor = null;
+    private DriveStyle driveStyle = null;
+    private boolean isLiftRunning = false;
+    private Intake intake;
+    private DeployTheBoi boiDeployer;
+    private File file;
+
+    @Override
+    public void init() {
+        boiDeployer = new DeployTheBoi(hardwareMap);
+        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        telemetry.addData("Status", "Initialized");
+
+        driveStyle = new FourWheelDriveStyle(hardwareMap,
+                telemetry,
+                "left_front_drive",
+                "right_front_drive",
+                "left_back_drive",
+                "right_back_drive");
+
+        intake = new DcMotorIntake(hardwareMap);
+
+        String filename = "AdafruitIMUCalibration.json";
+        file = AppUtil.getInstance().getSettingsFile(filename);
+
+    }
+
+    @Override
+    public void start() {
+        runtime.reset();
+    }
+
+    @Override
+    public void init_loop() {
+        telemetry.addData("status", "loop test... waiting for start");
+    }
+
+    @Override
+    public void loop() {
+        if (gamepad1.a) {
+            liftMotor.setPower(-LIFT_MAX_POWER);
+            isLiftRunning = true;
+        } else if (gamepad1.y) {
+            liftMotor.setPower(LIFT_MAX_POWER);
+            isLiftRunning = true;
+        } else {
+            liftMotor.setPower(0);
+            if (isLiftRunning) {
+                telemetry.addData("LiftEncoderValue; ", liftMotor.getCurrentPosition());
+                telemetry.update();
+                isLiftRunning = false;
+            }
+        }
+
+        double leftPower;
+        double rightPower;
+
+        double drive = -gamepad2.left_stick_y;
+        double turn = -gamepad2.right_stick_x;
+        leftPower = Range.clip(drive + turn, -1.0, 1.0);
+        rightPower = Range.clip(drive - turn, -1.0, 1.0);
+
+
+        if (gamepad2.left_trigger > 0.0) {
+            rampUp = true;
+        } else {
+            rampUp = false;
+        }
+        if (rampUp) {
+            if (leftRampedPower < leftPower) {
+                leftRampedPower += INCREMENT;
+            } else if (leftRampedPower > leftPower) {
+                leftRampedPower -= INCREMENT;
+            }
+            if (rightRampedPower < rightPower) {
+                rightRampedPower += INCREMENT;
+            } else if (rightRampedPower > rightPower) {
+                rightRampedPower -= INCREMENT;
+            }
+        } else {
+            leftRampedPower = leftPower;
+            rightRampedPower = rightPower;
+        }
+        if (gamepad1.left_bumper) {
+            StringBuilder log = new StringBuilder();
+            log.append("rightRampedPower: ");
+            log.append(rightRampedPower);
+            log.append('\n');
+            ReadWriteFile.writeFile(file, log.toString());
+            telemetry.addData("lift Motor", liftMotor.getCurrentPosition());
+        }
+
+        telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
+        telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("lift Motor", liftMotor.getCurrentPosition());
+        telemetry.update();
+
+        driveStyle.setDriveValues(leftRampedPower, rightRampedPower);
+
+        if (gamepad1.left_bumper) {
+            intake.retract();
+
+        } else if (gamepad2.right_bumper) {
+            intake.extend();
+
+        } else {
+            intake.stop();
+
+        }
+
+        if (gamepad1.b) {
+            intake.purge();
+
+        } else if (gamepad1.x) {
+            intake.binge();
+
+        } else {
+            intake.stop();
+
+        }
+
+        if (gamepad1.left_bumper)
+
+        {
+            boiDeployer.sweep();
+            if (gamepad1.right_bumper) {
+                boiDeployer.logPosition();
+            } else {
+                boiDeployer.stopDoingThing();
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        driveStyle.setDriveValues(0, 0);
+        intake.stop();
+        liftMotor.setPower(0);
+    }
+
+
+}

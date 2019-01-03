@@ -9,18 +9,20 @@ import org.firstinspires.ftc.robotcore.external.Func;
 
 @TeleOp(name = "TESTTeleOpMode", group = "TeleOp opmode")
 public class TestTelop extends OpMode {
-    private static final double STEP_SIZE = 0.05;
+    private static final double STEP_SIZE = 0.02;
+    private static final double SHOULDER_STEP_SIZE = .001;
     private Servo wristServo;
     private Servo elbowServo;
-    private DcMotor shoulderMotor;
+    private Servo shoulderServo;
+    private final double DRIVE_SERVO_MAX = .950;
+    private final double DRIVE_SERVO_MIN = .032;
 
     @Override
     public void init() {
-        shoulderMotor = hardwareMap.get(DcMotor.class, "shoulderMotor");
+        shoulderServo = hardwareMap.get(Servo.class, "shoulderServo");
         wristServo = hardwareMap.get(Servo.class, "wristServo");
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         composeTelemetry();
-        wristServo.setPosition(0);
     }
 
     private void composeTelemetry() {
@@ -38,12 +40,19 @@ public class TestTelop extends OpMode {
                         return elbowServo.getPosition();
                     }
                 });
-
+        telemetry.addLine()
+                .addData("shoulder", new Func<Double>() {
+                    @Override
+                    public Double value() {
+                        return shoulderServo.getPosition();
+                    }
+                });
     }
 
     @Override
     public void loop() {
         double currentElbowPosition = elbowServo.getPosition();
+        double currentShoulderPosition = shoulderServo.getPosition();
 
 //        if (gamepad2.right_stick_y > .1 ) {
 //            shoulderMotor.setPower(-.5);
@@ -53,15 +62,20 @@ public class TestTelop extends OpMode {
 //            shoulderMotor.setPower(.5);
 //            elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
 //        }
-        if (gamepad2.right_stick_y > .1 && currentElbowPosition + STEP_SIZE < 1) {
+        if (gamepad2.right_stick_y > .1 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
             elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
-        } else if (gamepad2.left_stick_y > .1) {
-            shoulderMotor.setPower(.5);
-        } else if (gamepad2.right_stick_y < -.1 && currentElbowPosition - STEP_SIZE > 0) {
+
+        } else if (gamepad2.left_stick_y > .1 && currentShoulderPosition + SHOULDER_STEP_SIZE < DRIVE_SERVO_MAX) {
+            shoulderServo.setPosition(currentShoulderPosition + SHOULDER_STEP_SIZE);
+
+        } else if (gamepad2.right_stick_y < -.1 && currentElbowPosition - STEP_SIZE > DRIVE_SERVO_MIN) {
             elbowServo.setPosition(currentElbowPosition - STEP_SIZE);
-        } else if (gamepad2.left_stick_y < -.1) {
-            shoulderMotor.setPower(-.5);
+
+        } else if (gamepad2.left_stick_y < -.1 && currentShoulderPosition - SHOULDER_STEP_SIZE > DRIVE_SERVO_MIN) {
+            shoulderServo.setPosition(currentShoulderPosition - SHOULDER_STEP_SIZE);
+
         }
+
 
 //        }else if (gamepad2.right_stick_y < -.1 && currentElbowPosition - STEP_SIZE < 1 ) {
 //            shoulderMotor.setPower(.5);

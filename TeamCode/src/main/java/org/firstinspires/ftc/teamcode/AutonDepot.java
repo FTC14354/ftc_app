@@ -53,8 +53,7 @@ public class AutonDepot extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-//        lowerFromLander();
-
+        lowerFromLander();
 
         GoldAlignDetector detector = initMineralDetector();
 
@@ -143,7 +142,7 @@ public class AutonDepot extends LinearOpMode {
                 }
 
             }
-            driveStyle.setDriveValues(-.8,-.8);
+            driveStyle.setDriveValues(-.8, -.8);
         }
 
         ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
