@@ -25,6 +25,8 @@ public class Teleop extends OpMode {
     private DeployTheBoi boiDeployer;
 
 
+
+
     @Override
     public void init() {
         boiDeployer = new DeployTheBoi(hardwareMap);
@@ -57,10 +59,10 @@ public class Teleop extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.a) {
+        if (gamepad1.y) {
             liftMotor.setPower(-LIFT_MAX_POWER);
             isLiftRunning = true;
-        } else if (gamepad1.y) {
+        } else if (gamepad1.a) {
             liftMotor.setPower(LIFT_MAX_POWER);
             isLiftRunning = true;
         } else {
@@ -106,6 +108,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData ("Encoders", ((FourWheelDriveStyle) driveStyle).getaencoderValues());
         telemetry.addData("lift Motor", liftMotor.getCurrentPosition());
         telemetry.update();
 

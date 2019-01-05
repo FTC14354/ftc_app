@@ -12,6 +12,16 @@ public class FourWheelDriveStyle implements DriveStyle {
     private DcMotor rightBackDrive = null;
     private Telemetry telemetry;
 
+    public String getaencoderValues() {
+        String returnValue;
+        returnValue = String.format("leftBackDrive: %s\n", leftBackDrive.getCurrentPosition());
+returnValue += String.format("rightBackDrive: %s\n", rightBackDrive.getCurrentPosition());
+returnValue += String.format("rightFrontDrive: %s\n", rightFrontDrive.getCurrentPosition());
+returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPosition());
+
+        return returnValue;
+    }
+
     public FourWheelDriveStyle() {
         // Do Nothing
     }
@@ -47,8 +57,9 @@ public class FourWheelDriveStyle implements DriveStyle {
         leftBackDrive.setPower(leftPower);
         rightBackDrive.setPower(rightPower);
     }
+
     @Override
-    public void stop (){
+    public void stop() {
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);

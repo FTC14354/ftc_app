@@ -8,6 +8,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -28,6 +29,7 @@ public class AutonDepot extends LinearOpMode {
     private final double DRIVE_MOTOR_MAX = 0.8;
     private BNO055IMU imu;
     private File file;
+    private boolean targetAccquired = false;
 
     public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
@@ -46,18 +48,20 @@ public class AutonDepot extends LinearOpMode {
                 "right_back_drive");
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
-
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lowerFromLander();
+//        lowerFromLander();
 
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
+
+        driveStyle.setDriveValues(-.8, -.8);
 
 //        driveToDepot();
 
@@ -142,7 +146,7 @@ public class AutonDepot extends LinearOpMode {
                 }
 
             }
-            driveStyle.setDriveValues(-.8, -.8);
+           return;
         }
 
         ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
