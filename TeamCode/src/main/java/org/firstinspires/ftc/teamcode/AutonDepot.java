@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ReadWriteFile;
+import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -26,10 +27,12 @@ public class AutonDepot extends LinearOpMode {
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
-    private final double DRIVE_MOTOR_MAX = 0.8;
     private BNO055IMU imu;
+    private final double DRIVE_MOTOR_MAX = 0.8;
     private File file;
     private boolean targetAccquired = false;
+    private boolean ableToGoStraight = true;
+    private boolean AbleToGoStraight2 = true;
 
     public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
@@ -61,9 +64,8 @@ public class AutonDepot extends LinearOpMode {
 
         alignToMineral(detector);
 
-        driveStyle.setDriveValues(-.8, -.8);
 
-//        driveToDepot();
+        driveToDepot();
 
         deployTheBoi();
 
@@ -107,9 +109,11 @@ public class AutonDepot extends LinearOpMode {
         imu.initialize(parameters);
         ReadWriteFile.writeFile(file, "imu init complete\n");
 
-        while (opModeIsActive() && !abort && !detector.getAligned()) {
+        CameraDevice.getInstance().setFlashTorchMode(true) ; //turns flash on
 
 
+
+        if (opModeIsActive() && !abort && !detector.getAligned()) {
             int dir = 0;
             while (opModeIsActive() && !abort && !detector.isFound()) {
                 float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -126,35 +130,43 @@ public class AutonDepot extends LinearOpMode {
                     }
                 }
             }
-            ReadWriteFile.writeFile(file, "Scanning complete\n");
-
-            telemetry.addLine().addData("Finished scanning abort is ", abort);
-            telemetry.update();
-            driveStyle.stop();
-
-            if (opModeIsActive() && detector.isFound()) {
-                double x = detector.getXPosition();
-                telemetry.addData("detector X Position:", x);
-                if (!detector.getAligned()) {
-
-
-                    if (x < 290) {
-                        driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-                    } else if (x > 350) {
-                        driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
-                    }
-                }
-
-            }
-           return;
         }
+        ReadWriteFile.writeFile(file, "Scanning complete\n");
+
+        telemetry.addLine().addData("Finished scanning abort is ", abort);
+        telemetry.update();
+        driveStyle.stop();
+
+        if (opModeIsActive() && detector.isFound()) {
+            double x = detector.getXPosition();
+            telemetry.addData("detector X Position:", x);
+            if (!detector.getAligned()) {
+
+
+                if (x < 290) {
+                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
+                    ableToGoStraight = false;
+                } else if (x > 350) {
+                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+                    AbleToGoStraight2 = false;
+                }
+            }
+            driveStyle.setDriveValues(-.8, -.8);
+            CameraDevice.getInstance().setFlashTorchMode(false ); //turns flash off
+        }
+
 
         ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
     }
 
-//        private void driveToDepot () {
-//
-//        }
+    private void driveToDepot() {
+        if (ableToGoStraight = false) {
+            driveStyle.setDriveValues(-.5, .5);
+        } else if (AbleToGoStraight2 = false) {
+            driveStyle.setDriveValues(.5, -.5);
+        }
+        driveStyle.driveToPosition(-1833);
+    }
 
     private void deployTheBoi() {
         DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
@@ -165,9 +177,12 @@ public class AutonDepot extends LinearOpMode {
         boiDeployer.stopDoingThing();
         sleep(2000);
         idle();
+
+
     }
-
-
 }
+
+
+
 
 

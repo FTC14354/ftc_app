@@ -5,9 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
@@ -23,8 +25,14 @@ public class Teleop extends OpMode {
     private boolean isLiftRunning = false;
     private Intake intake;
     private DeployTheBoi boiDeployer;
-
-
+    private static final double STEP_SIZE = 0.02;
+    //    private static final double SHOULDER_STEP_SIZE = .01;
+    private Servo wristServo;
+    private Servo elbowServo;
+    //    private Servo shoulderServo;
+    private final double DRIVE_SERVO_MAX = .950;
+    private final double DRIVE_SERVO_MIN = .032;
+    private DcMotor shoulderMotor;
 
 
     @Override
@@ -33,6 +41,29 @@ public class Teleop extends OpMode {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shoulderMotor = hardwareMap.get(DcMotor.class, "shoulderMotor");
+        shoulderMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wristServo = hardwareMap.get(Servo.class, "wristServo");
+        elbowServo = hardwareMap.get(Servo.class, "elbowServo");
+        composeTelemetry();
+        shoulderMotor = hardwareMap.dcMotor.get("shoulderMotor");
+    }
+
+    private void composeTelemetry() {
+        telemetry.addLine()
+                .addData("wrist", new Func<Double>() {
+                    @Override
+                    public Double value() {
+                        return wristServo.getPosition();
+                    }
+                });
+        telemetry.addLine()
+                .addData("elbow", new Func<Double>() {
+                    @Override
+                    public Double value() {
+                        return elbowServo.getPosition();
+                    }
+                });
 
 
         telemetry.addData("Status", "Initialized");
@@ -59,6 +90,7 @@ public class Teleop extends OpMode {
 
     @Override
     public void loop() {
+
         if (gamepad1.y) {
             liftMotor.setPower(-LIFT_MAX_POWER);
             isLiftRunning = true;
@@ -73,6 +105,28 @@ public class Teleop extends OpMode {
                 isLiftRunning = false;
             }
         }
+        double currentElbowPosition = elbowServo.getPosition();
+//        double currentShoulderPosition = shoulderServo.getPosition();
+        double currentShoulderPosition = shoulderMotor.getCurrentPosition();
+
+        if (gamepad1.right_stick_y < -.2 && currentElbowPosition - STEP_SIZE > DRIVE_SERVO_MIN) {
+            elbowServo.setPosition(currentElbowPosition - STEP_SIZE);
+        } else if (gamepad1.right_stick_y > .2 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
+            elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
+        }
+//
+        if (gamepad1.left_stick_y > .5 ) {
+            shoulderMotor.setPower(.3);
+        }
+//
+
+        else if (gamepad1.left_stick_y < -.5 ) {
+            shoulderMotor.setPower(-.3);
+
+        } else {
+            shoulderMotor.setPower(0);
+        }
+
 
         double leftPower;
         double rightPower;
@@ -103,12 +157,12 @@ public class Teleop extends OpMode {
             leftRampedPower = leftPower;
             rightRampedPower = rightPower;
         }
-
+        telemetry.addData("Shoulder", (shoulderMotor.getCurrentPosition()));
         telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
         telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-        telemetry.addData ("Encoders", ((FourWheelDriveStyle) driveStyle).getaencoderValues());
+        telemetry.addData("Encoders", ((FourWheelDriveStyle) driveStyle).getaencoderValues());
         telemetry.addData("lift Motor", liftMotor.getCurrentPosition());
         telemetry.update();
 
