@@ -10,21 +10,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ReadWriteFile;
-import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
-import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
 import java.io.File;
 
-
-@Autonomous(name = "AutonDepot", group = "Auton opmode")
-public class AutonDepot extends LinearOpMode {
-
+@Autonomous (name = "NOLiftAuton", group = "Auton opmode")
+public class CompetAuton extends LinearOpMode {
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
     private BNO055IMU imu;
@@ -34,7 +29,6 @@ public class AutonDepot extends LinearOpMode {
     private boolean ableToGoStraight = true;
     private boolean AbleToGoStraight2 = true;
     private StringBuilder sb = new StringBuilder();
-
     public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Status", "Waiting in Init");
@@ -59,20 +53,19 @@ public class AutonDepot extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lowerFromLander();
-
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
 
-        driveToDepot();
 
-        deployTheBoi();
-
-        parkInCrater();
+//        driveToDepot();
+//
+//        deployTheBoi();
+//        parkInCrater();
         ReadWriteFile.writeFile(file, sb.toString());
 
     }
+
 
     private GoldAlignDetector initMineralDetector() {
         ReadWriteFile.writeFile(file, "Starting initMineralDetector\n");
@@ -90,12 +83,6 @@ public class AutonDepot extends LinearOpMode {
         sb.append("Leaving initMineralDetector\r\n");
         return detector;
     }
-
-    private void lowerFromLander() {
-        LowerFromLander lowerFromLander = new LowerFromLander(hardwareMap, driveStyle);
-        lowerFromLander.landRobot();
-    }
-
     private void alignToMineral(GoldAlignDetector detector) throws InterruptedException {
         boolean abort = false;
         sb.append("Starting alignToMineral\r\n");
@@ -156,58 +143,5 @@ public class AutonDepot extends LinearOpMode {
 
 
         sb.append("Leaving alignToMineral abort = " + abort + "\r\n");
-    }
-
-    private void driveToDepot() {
-        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-        if (currentAngle > 10) {
-            sb.append("Not straight 1\r\n");
-            driveStyle.setDriveValues(.5, -.5);
-            while (currentAngle > 170) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-            }
-            driveStyle.setDriveValues(-.3, -.3);
-            sleep(250);
-        } else if (currentAngle < -10) {
-            sb.append("Not straight 2\r\n");
-            driveStyle.setDriveValues(-.5, .5);
-            while (currentAngle < 25) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-            }
-            driveStyle.setDriveValues(-.3, -.3);
-            sleep(250);
-        } else {
-            driveStyle.setDriveValues(-.3, -.3);
-            sleep (250);
-        }
-
-        sb.append("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
-
-
-        ReadWriteFile.writeFile(file, sb.toString());
-
-    }
-
-    private void deployTheBoi() {
-        if (opModeIsActive()) {
-            DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
-            boiDeployer.doTheThing();
-            idle();
-            sleep(2000);
-            idle();
-            boiDeployer.stopDoingThing();
-            sleep(2000);
-            idle();
-        }
-
-    }
-
-    public void parkInCrater() {
-
-    }
-}
-
-
-
-
+    }}
 
