@@ -30,8 +30,8 @@ public class Teleop extends OpMode {
     private Servo wristServo;
     private Servo elbowServo;
     //    private Servo shoulderServo;
-    private final double DRIVE_SERVO_MAX = .950;
-    private final double DRIVE_SERVO_MIN = .032;
+    private final double DRIVE_SERVO_MAX = .963;
+    private final double DRIVE_SERVO_MIN = .045;
     private DcMotor shoulderMotor;
 
 
@@ -47,6 +47,7 @@ public class Teleop extends OpMode {
         elbowServo = hardwareMap.get(Servo.class, "elbowServo");
         composeTelemetry();
         shoulderMotor = hardwareMap.dcMotor.get("shoulderMotor");
+        intake = new DcMotorIntake(hardwareMap);
     }
 
     private void composeTelemetry() {
@@ -75,7 +76,7 @@ public class Teleop extends OpMode {
                 "left_back_drive",
                 "right_back_drive");
 
-        intake = new DcMotorIntake(hardwareMap);
+
     }
 
     @Override
@@ -109,19 +110,19 @@ public class Teleop extends OpMode {
 //        double currentShoulderPosition = shoulderServo.getPosition();
         double currentShoulderPosition = shoulderMotor.getCurrentPosition();
 
-        if (gamepad1.right_stick_y < -.2 && currentElbowPosition - STEP_SIZE > DRIVE_SERVO_MIN) {
+        if (gamepad1.right_stick_y > .2 && currentElbowPosition - STEP_SIZE > DRIVE_SERVO_MIN) {
             elbowServo.setPosition(currentElbowPosition - STEP_SIZE);
-        } else if (gamepad1.right_stick_y > .2 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
+        } else if (gamepad1.right_stick_y < - .2 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
             elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
         }
 //
-        if (gamepad1.left_stick_y > .5 ) {
-            shoulderMotor.setPower(.3);
+        if (gamepad1.left_stick_y < -.5 ) {
+            shoulderMotor.setPower(.4);
         }
 //
 
-        else if (gamepad1.left_stick_y < -.5 ) {
-            shoulderMotor.setPower(-.3);
+        else if (gamepad1.left_stick_y > .5 ) {
+            shoulderMotor.setPower(-.4);
 
         } else {
             shoulderMotor.setPower(0);
@@ -137,7 +138,7 @@ public class Teleop extends OpMode {
         rightPower = Range.clip(drive - turn, -1.0, 1.0);
 
 
-        if (gamepad2.left_trigger > 0.0) {
+        if (gamepad2.left_trigger > 0.1) {
             rampUp = true;
         } else {
             rampUp = false;
@@ -190,16 +191,16 @@ public class Teleop extends OpMode {
 
         }
 
-        if (gamepad1.left_bumper)
-
-        {
-            boiDeployer.sweep();
-            if (gamepad1.right_bumper) {
-                boiDeployer.logPosition();
-            } else {
-                boiDeployer.stopDoingThing();
-            }
-        }
+//        if (gamepad1.left_bumper)
+//
+//        {
+//            boiDeployer.sweep();
+//            if (gamepad1.right_bumper) {
+//                boiDeployer.logPosition();
+//            } else {
+//                boiDeployer.stopDoingThing();
+//            }
+//        }
     }
 
     @Override

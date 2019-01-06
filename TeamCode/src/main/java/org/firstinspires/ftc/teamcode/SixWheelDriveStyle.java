@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.io.File;
+
 public class SixWheelDriveStyle implements DriveStyle {
     private HardwareMap hardwareMap = null;
     private DcMotor leftFrontDrive = null;
@@ -11,6 +13,7 @@ public class SixWheelDriveStyle implements DriveStyle {
     private DcMotor rightBackDrive = null;
     private DcMotor rightMiddleDrive = null;
     private DcMotor leftMiddleDrive = null;
+
 
     public SixWheelDriveStyle() {
         // Do Nothing
@@ -56,4 +59,15 @@ public class SixWheelDriveStyle implements DriveStyle {
     public void driveToPosition(int encoderTicks) {
 
     }
+
+    @Override
+    public void driveToPosition(int encoderTicks, File file) {
+
+    }
+
+    @Override
+    public int getEncoderValue() {
+        return leftFrontDrive.getCurrentPosition();
+    }
+
 }

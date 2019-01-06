@@ -13,8 +13,8 @@ public class LowerFromLander {
     private HardwareMap hardwareMap;
     private DcMotor liftMotor = null;
     private DriveStyle driveStyle = null;
-    private final static int encoder_ticks_top_released = -17721;
-    private final static int encoder_ticks_lowered = - 9968;
+    private final static int encoder_ticks_top_released = 17721;
+    private final static int encoder_ticks_lowered = -9972;
     private final static double POWER_MAX = 0.5;
 
     public LowerFromLander(HardwareMap hardwareMap, DriveStyle drivestyle) {

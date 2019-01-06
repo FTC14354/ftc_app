@@ -49,7 +49,7 @@ public class Auton extends LinearOpMode {
 
         lowerFromLander();
 
-        /*
+
         GoldAlignDetector detector = initMineralDetector();
 
         alignToMineral(detector);
@@ -59,7 +59,7 @@ public class Auton extends LinearOpMode {
         deployTheBoi();
 
         parkInCrater();
-        */
+
     }
 
     private GoldAlignDetector initMineralDetector() {
@@ -119,15 +119,15 @@ public class Auton extends LinearOpMode {
             telemetry.update();
             driveStyle.stop();
 
-//            if (detector.isFound()) {
-//                if (x < 320) {
-//                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-//                } else {
-//                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
-//                }
+            if (detector.isFound()) {
+                if (x < 320) {
+                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
+                } else {
+                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+                }
 
-               // driveStyle.driveToPosition(1400);
-//            }
+                driveStyle.driveToPosition(1400);
+            }
         }
     }
 

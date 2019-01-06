@@ -28,11 +28,12 @@ public class AutonDepot extends LinearOpMode {
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
     private BNO055IMU imu;
-    private final double DRIVE_MOTOR_MAX = 0.8;
+    private final double DRIVE_MOTOR_MAX = 0.5;
     private File file;
     private boolean targetAccquired = false;
     private boolean ableToGoStraight = true;
     private boolean AbleToGoStraight2 = true;
+    private StringBuilder sb = new StringBuilder();
 
     public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
@@ -58,7 +59,7 @@ public class AutonDepot extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-//        lowerFromLander();
+        lowerFromLander();
 
         GoldAlignDetector detector = initMineralDetector();
 
@@ -70,6 +71,7 @@ public class AutonDepot extends LinearOpMode {
         deployTheBoi();
 
 //        parkInCrater();
+        ReadWriteFile.writeFile(file,sb.toString());
 
     }
 
@@ -86,7 +88,7 @@ public class AutonDepot extends LinearOpMode {
         detector.ratioScorer.weight = 5;
         detector.ratioScorer.perfectRatio = 1.0;
         detector.enable();
-        ReadWriteFile.writeFile(file, "Leaving initMineralDetector\n");
+        sb.append("Leaving initMineralDetector\r\n");
         return detector;
     }
 
@@ -97,7 +99,7 @@ public class AutonDepot extends LinearOpMode {
 
     private void alignToMineral(GoldAlignDetector detector) throws InterruptedException {
         boolean abort = false;
-        ReadWriteFile.writeFile(file, "Starting alignToMineral\n");
+        sb.append("Starting alignToMineral\r\n");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -107,9 +109,9 @@ public class AutonDepot extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
-        ReadWriteFile.writeFile(file, "imu init complete\n");
+        sb.append("imu init complete\r\n");
 
-        CameraDevice.getInstance().setFlashTorchMode(true) ; //turns flash on
+
 
 
 
@@ -131,7 +133,7 @@ public class AutonDepot extends LinearOpMode {
                 }
             }
         }
-        ReadWriteFile.writeFile(file, "Scanning complete\n");
+        sb.append("Scanning complete\r\n");
 
         telemetry.addLine().addData("Finished scanning abort is ", abort);
         telemetry.update();
@@ -140,7 +142,7 @@ public class AutonDepot extends LinearOpMode {
         if (opModeIsActive() && detector.isFound()) {
             double x = detector.getXPosition();
             telemetry.addData("detector X Position:", x);
-            if (!detector.getAligned()) {
+            while (!detector.getAligned()) {
 
 
                 if (x < 290) {
@@ -151,33 +153,44 @@ public class AutonDepot extends LinearOpMode {
                     AbleToGoStraight2 = false;
                 }
             }
-            driveStyle.setDriveValues(-.8, -.8);
-            CameraDevice.getInstance().setFlashTorchMode(false ); //turns flash off
+            driveStyle.setDriveValues(-.6, -.6);
+            sleep(500);
+
         }
 
 
-        ReadWriteFile.writeFile(file, "Leaving alignToMineral abort = " + abort + "\n");
+        sb.append("Leaving alignToMineral abort = " + abort + "\r\n");
     }
 
     private void driveToDepot() {
-        if (ableToGoStraight = false) {
+        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        if (currentAngle > 10) {
+            sb.append("Not straight 1\r\n");
             driveStyle.setDriveValues(-.5, .5);
-        } else if (AbleToGoStraight2 = false) {
+            sleep(250);
+        } else if (currentAngle < -10) {
+            sb.append("Not straight 2\r\n");
             driveStyle.setDriveValues(.5, -.5);
+            sleep(250);
         }
-        driveStyle.driveToPosition(-1833);
+        sb.append("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
+        driveStyle.driveToPosition(-100, file);
+
+        ReadWriteFile.writeFile(file,sb.toString());
+
     }
 
     private void deployTheBoi() {
-        DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
-        boiDeployer.doTheThing();
-        idle();
-        sleep(2000);
-        idle();
-        boiDeployer.stopDoingThing();
-        sleep(2000);
-        idle();
-
+        if (opModeIsActive()) {
+            DeployTheBoi boiDeployer = new DeployTheBoi(hardwareMap);
+            boiDeployer.doTheThing();
+            idle();
+            sleep(2000);
+            idle();
+            boiDeployer.stopDoingThing();
+            sleep(2000);
+            idle();
+        }
 
     }
 }

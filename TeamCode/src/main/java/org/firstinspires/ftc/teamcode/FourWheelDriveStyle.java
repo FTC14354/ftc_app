@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.io.File;
 
 public class FourWheelDriveStyle implements DriveStyle {
     private DcMotor leftFrontDrive = null;
@@ -67,10 +70,10 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
     }
 
     @Override
-    public void driveToPosition(int encoderTicks) {
+    public void driveToPosition(int encoderTicks, File file) {
         int direction = 1;
-
-        if (encoderTicks < 0) {
+        StringBuffer sb = new StringBuffer();
+        if (0 > encoderTicks) {
             direction = -1;
         }
 
@@ -79,17 +82,26 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFrontDrive.setTargetPosition(encoderTicks);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setTargetPosition(encoderTicks);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setTargetPosition(encoderTicks);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setTargetPosition(encoderTicks);
 
         leftFrontDrive.setPower(.5 * direction);
         leftBackDrive.setPower(.5 * direction);
         rightFrontDrive.setPower(.5 * direction);
         rightBackDrive.setPower(.5 * direction);
 
-        while (Math.abs(leftBackDrive.getCurrentPosition()) < encoderTicks) {
+
+        while (leftBackDrive.isBusy()) {
+            sb.append("position: " + leftBackDrive.getCurrentPosition());
+            if(file != null)
+                ReadWriteFile.writeFile(file,sb.toString());
+
             telemetry.addData("leftBackDrive: ", leftBackDrive.getCurrentPosition());
             telemetry.update();
         }
@@ -99,5 +111,15 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
 
+    }
+
+    @Override
+    public int getEncoderValue() {
+        return leftBackDrive.getCurrentPosition();
+    }
+
+    @Override
+    public void driveToPosition(int i) {
+        driveToPosition(i, null);
     }
 }
