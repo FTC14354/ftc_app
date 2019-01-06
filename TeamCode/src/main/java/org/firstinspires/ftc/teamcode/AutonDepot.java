@@ -69,9 +69,8 @@ public class AutonDepot extends LinearOpMode {
         driveToDepot();
 
         deployTheBoi();
-
 //        parkInCrater();
-        ReadWriteFile.writeFile(file,sb.toString());
+        ReadWriteFile.writeFile(file, sb.toString());
 
     }
 
@@ -110,9 +109,6 @@ public class AutonDepot extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
         sb.append("imu init complete\r\n");
-
-
-
 
 
         if (opModeIsActive() && !abort && !detector.getAligned()) {
@@ -167,16 +163,25 @@ public class AutonDepot extends LinearOpMode {
         if (currentAngle > 10) {
             sb.append("Not straight 1\r\n");
             driveStyle.setDriveValues(-.5, .5);
-            sleep(250);
+            while (currentAngle > -190) {
+                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            }
+            driveStyle.driveToPosition(100, file);
         } else if (currentAngle < -10) {
             sb.append("Not straight 2\r\n");
             driveStyle.setDriveValues(.5, -.5);
-            sleep(250);
+            while (currentAngle < 30) {
+                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            }
+            driveStyle.driveToPosition(-100, file);
+        } else {
+            driveStyle.driveToPosition(-100, file);
         }
-        sb.append("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
-        driveStyle.driveToPosition(-100, file);
 
-        ReadWriteFile.writeFile(file,sb.toString());
+        sb.append("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
+
+
+        ReadWriteFile.writeFile(file, sb.toString());
 
     }
 
