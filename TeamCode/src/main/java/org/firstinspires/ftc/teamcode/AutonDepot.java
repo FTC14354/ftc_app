@@ -19,21 +19,21 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
-import java.io.File;
+import android.util.Log;
 
+import java.io.File;
 
 @Autonomous(name = "AutonDepot", group = "Auton opmode")
 public class AutonDepot extends LinearOpMode {
+    private static final String TELEMETRY_TAG = "Telemetry";
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
     private BNO055IMU imu;
     private final double DRIVE_MOTOR_MAX = 0.5;
     private File file;
-    private boolean targetAccquired = false;
-    private boolean ableToGoStraight = true;
-    private boolean AbleToGoStraight2 = true;
-    private StringBuilder sb = new StringBuilder();
+
+    private double initialMineralAngle = 0;
 
     public void runOpMode() throws InterruptedException {
         while (!opModeIsActive() && !isStopRequested()) {
@@ -59,7 +59,7 @@ public class AutonDepot extends LinearOpMode {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lowerFromLander();
+//        lowerFromLander();
 
         GoldAlignDetector detector = initMineralDetector();
 
@@ -70,8 +70,6 @@ public class AutonDepot extends LinearOpMode {
         deployTheBoi();
 
         parkInCrater();
-        ReadWriteFile.writeFile(file, sb.toString());
-
     }
 
     private GoldAlignDetector initMineralDetector() {
@@ -87,18 +85,18 @@ public class AutonDepot extends LinearOpMode {
         detector.ratioScorer.weight = 5;
         detector.ratioScorer.perfectRatio = 1.0;
         detector.enable();
-        sb.append("Leaving initMineralDetector\r\n");
+        logMessage("Leaving initMineralDetector\r\n");
         return detector;
     }
 
-    private void lowerFromLander() {
-        LowerFromLander lowerFromLander = new LowerFromLander(hardwareMap, driveStyle);
-        lowerFromLander.landRobot();
-    }
+//    private void lowerFromLander() {
+//        LowerFromLander lowerFromLander = new LowerFromLander(hardwareMap, driveStyle);
+//        lowerFromLander.landRobot();
+//    }
 
     private void alignToMineral(GoldAlignDetector detector) throws InterruptedException {
         boolean abort = false;
-        sb.append("Starting alignToMineral\r\n");
+        logMessage("Starting alignToMineral\r\n");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -108,8 +106,7 @@ public class AutonDepot extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
-        sb.append("imu init complete\r\n");
-
+        logMessage("imu init complete\r\n");
 
         if (opModeIsActive() && !abort && !detector.getAligned()) {
             int dir = 0;
@@ -129,24 +126,21 @@ public class AutonDepot extends LinearOpMode {
                 }
             }
         }
-        sb.append("Scanning complete\r\n");
+        logMessage("Scanning complete\r\n");
 
         telemetry.addLine().addData("Finished scanning abort is ", abort);
         telemetry.update();
         driveStyle.stop();
 
         if (opModeIsActive() && detector.isFound()) {
-            double x = detector.getXPosition();
-            telemetry.addData("detector X Position:", x);
+            initialMineralAngle = detector.getXPosition();
+            telemetry.addData("detector X Position:", initialMineralAngle);
             while (!detector.getAligned()) {
 
-
-                if (x < 290) {
+                if (initialMineralAngle < 290) {
                     driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-                    ableToGoStraight = false;
-                } else if (x > 350) {
+                } else if (initialMineralAngle > 350) {
                     driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
-                    AbleToGoStraight2 = false;
                 }
             }
             driveStyle.setDriveValues(-.6, -.6);
@@ -154,14 +148,13 @@ public class AutonDepot extends LinearOpMode {
 
         }
 
-
-        sb.append("Leaving alignToMineral abort = " + abort + "\r\n");
+        logMessage("Leaving alignToMineral abort = " + abort + "\r\n");
     }
 
     private void driveToDepot() {
         float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
         if (currentAngle > 10) {
-            sb.append("Not straight 1\r\n");
+            logMessage("Left of Depot\r\n");
             driveStyle.setDriveValues(.5, -.5);
             while (currentAngle > 170) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -169,7 +162,7 @@ public class AutonDepot extends LinearOpMode {
             driveStyle.setDriveValues(-.3, -.3);
             sleep(250);
         } else if (currentAngle < -10) {
-            sb.append("Not straight 2\r\n");
+            logMessage("Right of Depot\r\n");
             driveStyle.setDriveValues(-.5, .5);
             while (currentAngle < 25) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -177,15 +170,12 @@ public class AutonDepot extends LinearOpMode {
             driveStyle.setDriveValues(-.3, -.3);
             sleep(250);
         } else {
+            logMessage("Aligned with Depot");
             driveStyle.setDriveValues(-.3, -.3);
-            sleep (250);
+            sleep(250);
         }
 
-        sb.append("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
-
-
-        ReadWriteFile.writeFile(file, sb.toString());
-
+        logMessage("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
     }
 
     private void deployTheBoi() {
@@ -200,6 +190,10 @@ public class AutonDepot extends LinearOpMode {
             idle();
         }
 
+    }
+
+    private void logMessage(String message) {
+        Log.i(TELEMETRY_TAG, message);
     }
 
     public void parkInCrater() {

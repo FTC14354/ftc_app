@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
@@ -9,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.io.File;
 
 public class FourWheelDriveStyle implements DriveStyle {
+    private static final String TELEMETRY_TAG = "Telemetry";
+
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
@@ -18,9 +23,9 @@ public class FourWheelDriveStyle implements DriveStyle {
     public String getaencoderValues() {
         String returnValue;
         returnValue = String.format("leftBackDrive: %s\n", leftBackDrive.getCurrentPosition());
-returnValue += String.format("rightBackDrive: %s\n", rightBackDrive.getCurrentPosition());
-returnValue += String.format("rightFrontDrive: %s\n", rightFrontDrive.getCurrentPosition());
-returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPosition());
+        returnValue += String.format("rightBackDrive: %s\n", rightBackDrive.getCurrentPosition());
+        returnValue += String.format("rightFrontDrive: %s\n", rightFrontDrive.getCurrentPosition());
+        returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPosition());
 
         return returnValue;
     }
@@ -35,10 +40,10 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
         leftBackDrive = hardwareMap.get(DcMotor.class, leftBackDriveName);
         rightBackDrive = hardwareMap.get(DcMotor.class, rightBackDriveName);
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -71,11 +76,7 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
 
     @Override
     public void driveToPosition(int encoderTicks, File file) {
-        int direction = 1;
-        StringBuffer sb = new StringBuffer();
-        if (0 > encoderTicks) {
-            direction = -1;
-        }
+        encoderTicks = -encoderTicks;
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -91,19 +92,17 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setTargetPosition(encoderTicks);
 
-        leftFrontDrive.setPower(.5 * direction);
-        leftBackDrive.setPower(.5 * direction);
-        rightFrontDrive.setPower(.5 * direction);
-        rightBackDrive.setPower(.5 * direction);
+        leftFrontDrive.setPower(.5);
+        leftBackDrive.setPower(.5);
+        rightFrontDrive.setPower(.5);
+        rightBackDrive.setPower(.5);
 
 
         while (leftBackDrive.isBusy()) {
-            sb.append("position: " + leftBackDrive.getCurrentPosition());
-            if(file != null)
-                ReadWriteFile.writeFile(file,sb.toString());
-
             telemetry.addData("leftBackDrive: ", leftBackDrive.getCurrentPosition());
             telemetry.update();
+            logMessage(String.format("Left Back Drive: %s", leftBackDrive.getCurrentPosition()));
+
         }
 
         leftFrontDrive.setPower(0);
@@ -111,6 +110,10 @@ returnValue += String.format("leftFrontDrive: %s\n", leftFrontDrive.getCurrentPo
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
 
+    }
+
+    private void logMessage(String message) {
+        Log.i(TELEMETRY_TAG, message);
     }
 
     @Override
