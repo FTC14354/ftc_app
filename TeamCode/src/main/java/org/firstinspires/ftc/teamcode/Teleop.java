@@ -69,12 +69,11 @@ public class Teleop extends OpMode {
 
         telemetry.addData("Status", "Initialized");
 
-        driveStyle = new FourWheelDriveStyle(hardwareMap,
-                telemetry,
+        driveStyle = new FourWheelDriveStyle(hardwareMap, telemetry,
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
-                "right_back_drive");
+                "right_back_drive", );
 
 
     }
@@ -112,16 +111,16 @@ public class Teleop extends OpMode {
 
         if (gamepad1.right_stick_y > .2 && currentElbowPosition - STEP_SIZE > DRIVE_SERVO_MIN) {
             elbowServo.setPosition(currentElbowPosition - STEP_SIZE);
-        } else if (gamepad1.right_stick_y < - .2 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
+        } else if (gamepad1.right_stick_y < -.2 && currentElbowPosition + STEP_SIZE < DRIVE_SERVO_MAX) {
             elbowServo.setPosition(currentElbowPosition + STEP_SIZE);
         }
 //
-        if (gamepad1.left_stick_y < -.5 ) {
+        if (gamepad1.left_stick_y < -.5) {
             shoulderMotor.setPower(.4);
         }
 //
 
-        else if (gamepad1.left_stick_y > .5 ) {
+        else if (gamepad1.left_stick_y > .5) {
             shoulderMotor.setPower(-.4);
 
         } else {
@@ -143,7 +142,7 @@ public class Teleop extends OpMode {
         } else {
             rampUp = false;
         }
-        if (rampUp) {
+        if (rampUp = true) {
             if (leftRampedPower < leftPower) {
                 leftRampedPower += INCREMENT;
             } else if (leftRampedPower > leftPower) {

@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ReadWriteFile;
@@ -44,12 +45,7 @@ public class AutonDepot extends LinearOpMode {
         String filename = "sweepLog.log";
         file = AppUtil.getInstance().getSettingsFile(filename);
 
-        driveStyle = new FourWheelDriveStyle(hardwareMap,
-                telemetry,
-                "left_front_drive",
-                "right_front_drive",
-                "left_back_drive",
-                "right_back_drive");
+        driveStyle = new FourWheelDriveStyle(hardwareMap, telemetry,"left_front_drive", "right_front_drive", "left_back_drive", "right_back_drive",);
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
