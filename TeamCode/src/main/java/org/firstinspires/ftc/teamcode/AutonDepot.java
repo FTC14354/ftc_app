@@ -45,7 +45,7 @@ public class AutonDepot extends LinearOpMode {
         String filename = "sweepLog.log";
         file = AppUtil.getInstance().getSettingsFile(filename);
 
-        driveStyle = new FourWheelDriveStyle(hardwareMap, telemetry,"left_front_drive", "right_front_drive", "left_back_drive", "right_back_drive",);
+        driveStyle = new FourWheelDriveStyle(hardwareMap, telemetry,"left_front_drive", "right_front_drive", "left_back_drive", "right_back_drive", this);
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);

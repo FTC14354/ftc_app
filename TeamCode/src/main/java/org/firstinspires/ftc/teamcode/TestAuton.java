@@ -49,7 +49,7 @@ public class TestAuton extends LinearOpMode {
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
-                "right_back_drive");
+                "right_back_drive", this);
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -152,10 +152,12 @@ public class TestAuton extends LinearOpMode {
     }
 
     private void driveToDepot() {
+        FourWheelDriveStyle fwd = (FourWheelDriveStyle) driveStyle;
+
         Log.i(TELEMETRY_TAG, "Forward");
-        driveStyle.driveToPosition(-1508);
+        fwd.EncoderDrive(.5, 10, 10, 4, 1 );
         Log.i(TELEMETRY_TAG, "Backward");
-        driveStyle.driveToPosition(1508);
+        fwd. EncoderDrive(.5, 10, 10, 4, -1);
 //        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 //        if (currentAngle > 10) {
 //            logMessage("Left of Depot\r\n");
