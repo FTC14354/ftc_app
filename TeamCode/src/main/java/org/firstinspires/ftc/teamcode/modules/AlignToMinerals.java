@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.modules;
 
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,6 +11,7 @@ public class AlignToMinerals {
     private FourWheelDriveStyle driving;
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
+    private OpMode opMode;
     private GoldAlignDetector detector;
 
     public void nameThing() {
@@ -20,7 +22,7 @@ public class AlignToMinerals {
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
-                "right_back_drive");
+                "right_back_drive", opMode);
 
     }
 

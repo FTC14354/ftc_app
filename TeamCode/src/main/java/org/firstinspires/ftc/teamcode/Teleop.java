@@ -162,7 +162,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-        telemetry.addData("Encoders", ((FourWheelDriveStyle) driveStyle).getaencoderValues());
+        telemetry.addData("Encoders", ((FourWheelDriveStyle) driveStyle).getencoderValues());
         telemetry.addData("lift Motor", liftMotor.getCurrentPosition());
         telemetry.update();
 

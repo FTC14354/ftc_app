@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 import com.vuforia.CameraDevice;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -157,7 +158,12 @@ public class TestAuton extends LinearOpMode {
         Log.i(TELEMETRY_TAG, "Forward");
         fwd.EncoderDrive(.5, 10, 10, 4, 1 );
         Log.i(TELEMETRY_TAG, "Backward");
-        fwd. EncoderDrive(.5, 10, 10, 4, -1);
+        fwd. EncoderDrive(.5, -10, -10, -4, -1);
+        Log.i (TELEMETRY_TAG, "Forward Run to Position");
+        driveStyle.driveToPosition(1000);
+        Log. i (TELEMETRY_TAG, "Reverse Run to Position");
+        driveStyle.driveToPosition(-1000);
+
 //        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 //        if (currentAngle > 10) {
 //            logMessage("Left of Depot\r\n");

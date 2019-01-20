@@ -48,7 +48,7 @@ public class TestyTeleop extends AutonDepot {
                     "left_front_drive",
                     "right_front_drive",
                     "left_back_drive",
-                    "right_back_drive");
+                    "right_back_drive", this);
 
             liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
             liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);

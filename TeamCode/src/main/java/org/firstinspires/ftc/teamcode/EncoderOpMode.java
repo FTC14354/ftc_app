@@ -17,7 +17,7 @@ public class EncoderOpMode extends LinearOpMode {
                 "left_front_drive",
                 "right_front_drive",
                 "left_back_drive",
-                "right_back_drive");
+                "right_back_drive", this);
 
         if (opModeIsActive()) {
             driveStyle.driveToPosition(1120);
