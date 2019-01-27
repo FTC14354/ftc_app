@@ -38,8 +38,8 @@ public class FourWheelDriveStyle implements DriveStyle {
     double RightBackPower;
     double LeftBackPower;
     double CountsPerInch;
-    private volatile boolean   stopRequested   = false;
-    private volatile boolean   isStarted       = false;
+    private volatile boolean stopRequested = false;
+    private volatile boolean isStarted = false;
 
     public String getencoderValues() {
         String returnValue;
@@ -55,7 +55,7 @@ public class FourWheelDriveStyle implements DriveStyle {
         // Do Nothing
     }
 
-    public FourWheelDriveStyle(HardwareMap hardwareMap, Telemetry telemetry, String leftFrontDriveName, String rightFrontDriveName, String leftBackDriveName, String rightBackDriveName, OpMode opMode, Runtime runtime) {
+    public FourWheelDriveStyle(HardwareMap hardwareMap, Telemetry telemetry, String leftFrontDriveName, String rightFrontDriveName, String leftBackDriveName, String rightBackDriveName, OpMode opMode) {
         leftFrontDrive = hardwareMap.get(DcMotor.class, leftFrontDriveName);
         rightFrontDrive = hardwareMap.get(DcMotor.class, rightFrontDriveName);
         leftBackDrive = hardwareMap.get(DcMotor.class, leftBackDriveName);
@@ -80,14 +80,17 @@ public class FourWheelDriveStyle implements DriveStyle {
         this.opMode = opMode;
         this.telemetry = telemetry;
     }
+
     public final void idle() {
         // Otherwise, yield back our thread scheduling quantum and give other threads at
         // our priority level a chance to run
         Thread.yield();
     }
+
     public final boolean isStopRequested() {
         return this.stopRequested || Thread.currentThread().isInterrupted();
     }
+
     public final boolean isStarted() {
         return this.isStarted || Thread.currentThread().isInterrupted();
     }
@@ -172,7 +175,7 @@ public class FourWheelDriveStyle implements DriveStyle {
             rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             // reset the timeout time and start motion.
-           runtime.reset();
+            opMode.resetStartTime();
             // This gets where the motor encoders will be at full position when it will be at full speed.
             double LeftEncoderPositionAtFullSpeed = ((AccelerationInches * (CountsPerInch)) + LeftPosition);
             double RightEncoderPositionAtFullSpeed = ((AccelerationInches * (CountsPerInch)) + RightPosition);
@@ -181,63 +184,62 @@ public class FourWheelDriveStyle implements DriveStyle {
 
             // This gets the absolute value of the encoder positions at full speed - the current speed, and while it's greater than 0, it will continues increasing the speed.
             // This allows the robot to accelerate over a set number of inches, which reduces wheel slippage and increases overall reliability
-            while (leftFrontDrive.isBusy() && leftBackDrive.isBusy() && rightBackDrive.isBusy() && rightFrontDrive.isBusy() && Running && this.opModeIsActive()){
+            while (leftFrontDrive.isBusy() && leftBackDrive.isBusy() && rightBackDrive.isBusy() && rightFrontDrive.isBusy() && Running && this.opModeIsActive()) {
 
-            // While encoders are not at position
-            if (((Math.abs(speed)) - (Math.abs(leftBackDrive.getPower()))) > .05 && ((Math.abs(speed)) - (Math.abs(leftFrontDrive.getPower()))) > .05) {
-                // This allows the robot to accelerate over a set distance, rather than going full speed.  This reduces wheel slippage and increases reliability.
-                LeftFrontPower = (Range.clip(Math.abs((leftFrontDrive.getCurrentPosition()) / (LeftEncoderPositionAtFullSpeed)), .15, speed));
-                RightFrontPower = (Range.clip(Math.abs((rightFrontDrive.getCurrentPosition()) / (RightEncoderPositionAtFullSpeed)), .15, speed));
-                LeftBackPower = (Range.clip(Math.abs((leftBackDrive.getCurrentPosition()) / (LeftEncoderPositionAtFullSpeed)), .15, speed));
-                RightBackPower = (Range.clip(Math.abs((rightBackDrive.getCurrentPosition()) / (RightEncoderPositionAtFullSpeed)), .15, speed));
-
-
-                leftFrontDrive.setPower(LeftFrontPower * Direction);
-                rightFrontDrive.setPower(RightFrontPower * Direction);
-                leftBackDrive.setPower(LeftBackPower * Direction);
-                rightBackDrive.setPower(RightBackPower * Direction);
+                // While encoders are not at position
+                if (((Math.abs(speed)) - (Math.abs(leftBackDrive.getPower()))) > .05 && ((Math.abs(speed)) - (Math.abs(leftFrontDrive.getPower()))) > .05) {
+                    // This allows the robot to accelerate over a set distance, rather than going full speed.  This reduces wheel slippage and increases reliability.
+                    LeftFrontPower = (Range.clip(Math.abs((leftFrontDrive.getCurrentPosition()) / (LeftEncoderPositionAtFullSpeed)), .15, speed));
+                    RightFrontPower = (Range.clip(Math.abs((rightFrontDrive.getCurrentPosition()) / (RightEncoderPositionAtFullSpeed)), .15, speed));
+                    LeftBackPower = (Range.clip(Math.abs((leftBackDrive.getCurrentPosition()) / (LeftEncoderPositionAtFullSpeed)), .15, speed));
+                    RightBackPower = (Range.clip(Math.abs((rightBackDrive.getCurrentPosition()) / (RightEncoderPositionAtFullSpeed)), .15, speed));
 
 
-
-                telemetry.addData("Accelerating", RightEncoderPositionAtFullSpeed);
-                telemetry.addData("Path1", "Running to %7d :%7d", NewLeftFrontTarget, NewRightFrontTarget, NewLeftBackTarget, NewRightBackTarget);
-                telemetry.addData("Path2", "Running at %7d :%7d", leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
-                telemetry.update();
-            } else if (Math.abs(NewLeftFrontTarget) - Math.abs(leftFrontDrive.getCurrentPosition()) < -1 && Math.abs(NewLeftBackTarget) - Math.abs(leftBackDrive.getCurrentPosition()) < -1) {
-                Running = false;
-            } else {
-                leftFrontDrive.setPower((speed * Direction));
-                leftBackDrive.setPower((speed * Direction));
-                rightFrontDrive.setPower((speed * Direction));
-                rightBackDrive.setPower((speed * Direction));
+                    leftFrontDrive.setPower(LeftFrontPower * Direction);
+                    rightFrontDrive.setPower(RightFrontPower * Direction);
+                    leftBackDrive.setPower(LeftBackPower * Direction);
+                    rightBackDrive.setPower(RightBackPower * Direction);
 
 
-                telemetry.addData("Path1", "Running to %7d :%7d", NewLeftBackTarget, NewRightBackTarget, NewRightFrontTarget, NewLeftFrontTarget);
-                telemetry.addData("Path2", "Running at %7d :%7d", leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition(), leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition());
-                telemetry.update();
+                    telemetry.addData("Accelerating", RightEncoderPositionAtFullSpeed);
+                    telemetry.addData("Path1", "Running to %7d :%7d", NewLeftFrontTarget, NewRightFrontTarget, NewLeftBackTarget, NewRightBackTarget);
+                    telemetry.addData("Path2", "Running at %7d :%7d", leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
+                    telemetry.update();
+                } else if (Math.abs(NewLeftFrontTarget) - Math.abs(leftFrontDrive.getCurrentPosition()) < -1 && Math.abs(NewLeftBackTarget) - Math.abs(leftBackDrive.getCurrentPosition()) < -1) {
+                    Running = false;
+                } else {
+                    leftFrontDrive.setPower((speed * Direction));
+                    leftBackDrive.setPower((speed * Direction));
+                    rightFrontDrive.setPower((speed * Direction));
+                    rightBackDrive.setPower((speed * Direction));
+
+
+                    telemetry.addData("Path1", "Running to %7d :%7d", NewLeftBackTarget, NewRightBackTarget, NewRightFrontTarget, NewLeftFrontTarget);
+                    telemetry.addData("Path2", "Running at %7d :%7d", leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition(), leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition());
+                    telemetry.update();
+                }
+
             }
-
-        }
 //                // Display information for the driver.
 
 
-        // Stops all motion
-        // Set to run without encoder, so it's not necessary to declare this every time after the method is used
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            // Stops all motion
+            // Set to run without encoder, so it's not necessary to declare this every time after the method is used
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // Set power to 0
-        leftBackDrive.setPower(0);
-        leftFrontDrive.setPower(0);
-        rightBackDrive.setPower(0);
-        rightFrontDrive.setPower(0
-        );
+            // Set power to 0
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0
+            );
+
+        }
 
     }
-
-}
 
     @Override
     public void driveToPosition(int encoderTicks, File file) {
@@ -283,7 +285,7 @@ public class FourWheelDriveStyle implements DriveStyle {
 
     @Override
     public int getEncoderValue() {
-        return leftBackDrive.getCurrentPosition();
+        return leftFrontDrive.getCurrentPosition();
     }
 
     @Override

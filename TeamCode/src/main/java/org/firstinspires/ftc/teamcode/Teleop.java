@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -24,6 +26,7 @@ public class Teleop extends OpMode {
     private DriveStyle driveStyle = null;
     private boolean isLiftRunning = false;
     private Intake intake;
+    private CRServo intakeServo;
     private DeployTheBoi boiDeployer;
     private static final double STEP_SIZE = 0.02;
     //    private static final double SHOULDER_STEP_SIZE = .01;
@@ -136,13 +139,18 @@ public class Teleop extends OpMode {
         leftPower = Range.clip(drive + turn, -1.0, 1.0);
         rightPower = Range.clip(drive - turn, -1.0, 1.0);
 
+        if (gamepad1.right_trigger > .1) {
+            intakeServo.setDirection(Direction.FORWARD);
+            intakeServo.setPower(.3);
+
+
+        } else if (gamepad1.left_trigger > 1) {
+            intakeServo.setDirection(Direction.REVERSE);
+            intakeServo.setPower(.3);
+        }
 
         if (gamepad2.left_trigger > 0.1) {
-            rampUp = true;
-        } else {
-            rampUp = false;
-        }
-        if (rampUp = true) {
+
             if (leftRampedPower < leftPower) {
                 leftRampedPower += INCREMENT;
             } else if (leftRampedPower > leftPower) {

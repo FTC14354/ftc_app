@@ -153,41 +153,31 @@ public class TestAuton extends LinearOpMode {
     }
 
     private void driveToDepot() {
-        FourWheelDriveStyle fwd = (FourWheelDriveStyle) driveStyle;
 
-        Log.i(TELEMETRY_TAG, "Forward");
-        fwd.EncoderDrive(.5, 10, 10, 4, 1 );
-        Log.i(TELEMETRY_TAG, "Backward");
-        fwd. EncoderDrive(.5, -10, -10, -4, -1);
-        Log.i (TELEMETRY_TAG, "Forward Run to Position");
-        driveStyle.driveToPosition(1000);
-        Log. i (TELEMETRY_TAG, "Reverse Run to Position");
-        driveStyle.driveToPosition(-1000);
+        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        if (currentAngle > 10) {
+            logMessage("Left of Depot\r\n");
+            driveStyle.setDriveValues(.5, -.5);
+            while (currentAngle > 170) {
+                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            }
+            driveStyle.setDriveValues(-.3, -.3);
+            sleep(250);
+        } else if (currentAngle < -10) {
+            logMessage("Right of Depot\r\n");
+            driveStyle.setDriveValues(-.5, .5);
+            while (currentAngle < 25) {
+                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            }
+            driveStyle.setDriveValues(-.3, -.3);
+            sleep(250);
+        } else {
+            logMessage("Aligned with Depot");
+            driveStyle.setDriveValues(-.3, -.3);
+            sleep(250);
+        }
 
-//        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-//        if (currentAngle > 10) {
-//            logMessage("Left of Depot\r\n");
-//            driveStyle.setDriveValues(.5, -.5);
-//            while (currentAngle > 170) {
-//                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-//            }
-//            driveStyle.setDriveValues(-.3, -.3);
-//            sleep(250);
-//        } else if (currentAngle < -10) {
-//            logMessage("Right of Depot\r\n");
-//            driveStyle.setDriveValues(-.5, .5);
-//            while (currentAngle < 25) {
-//                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-//            }
-//            driveStyle.setDriveValues(-.3, -.3);
-//            sleep(250);
-//        } else {
-//            logMessage("Aligned with Depot");
-//            driveStyle.setDriveValues(-.3, -.3);
-//            sleep(250);
-//        }
-//
-//        logMessage("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
+        logMessage("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
     }
 
     private void deployTheBoi() {
