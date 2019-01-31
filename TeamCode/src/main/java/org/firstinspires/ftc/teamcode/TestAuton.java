@@ -20,6 +20,9 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 import org.firstinspires.ftc.teamcode.modules.LowerFromLander;
 
+import android.media.AudioManager;
+
+import android.media.SoundPool;
 import android.util.Log;
 
 import java.io.File;
@@ -27,6 +30,8 @@ import java.io.File;
 @Autonomous(name = "Test1Auton", group = "Auton opmode")
 public class TestAuton extends LinearOpMode {
     private static final String TELEMETRY_TAG = "Telemetry";
+    private SoundPool mySound;
+    private int beepId;
 
     private DcMotor liftMotor;
     private DriveStyle driveStyle;
@@ -41,6 +46,9 @@ public class TestAuton extends LinearOpMode {
             telemetry.addData("Status", "Waiting in Init");
             telemetry.update();
         }
+
+        mySound = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        beepId = (mySound).load (hardwareMap.appContext, R.raw.chimedisconnect, 1);
 
         String filename = "sweepLog.log";
         file = AppUtil.getInstance().getSettingsFile(filename);
@@ -62,9 +70,10 @@ public class TestAuton extends LinearOpMode {
 
 //        lowerFromLander();
 
-//        GoldAlignDetector detector = initMineralDetector();
-//
-//        alignToMineral(detector);
+        GoldAlignDetector detector = initMineralDetector();
+
+        alignToMineral(detector);
+//        initImu();
 
         driveToDepot();
 
@@ -99,6 +108,53 @@ public class TestAuton extends LinearOpMode {
         boolean abort = false;
         logMessage("Starting alignToMineral\r\n");
 
+        initImu();
+
+        if (opModeIsActive() && !abort && !detector.getAligned()) {
+            int dir = 0;
+            while (opModeIsActive() && !abort && !detector.isFound()) {
+                float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+                telemetry.addData("currentAngle:", currentAngle);
+                telemetry.update();
+                if (dir == 0 && currentAngle < 35) {
+                    driveStyle.setDriveValues(-.5, .5);
+                } else {
+                    dir = 1;
+                    if (currentAngle > -35) {
+                        driveStyle.setDriveValues(.5, -.5);
+                    } else {
+                        abort = true;
+                    }
+                }
+            }
+        }
+        logMessage("Scanning complete found = " + detector.isFound() + "\r\n");
+
+        logMessage("Finished scanning abort is " + abort + "\r\n");
+        telemetry.update();
+        driveStyle.stop();
+
+        if (opModeIsActive() && detector.isFound()) {
+            initialMineralAngle = detector.getXPosition();
+            logMessage("detector X Position: " + initialMineralAngle + "\r\n");
+
+            while (!detector.getAligned()) {
+
+                if (initialMineralAngle < 290) {
+                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
+                } else if (initialMineralAngle > 350) {
+                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
+                }
+            }
+            driveStyle.setDriveValues(-.6, -.6);
+            sleep(1000);
+
+        }
+
+        logMessage("Leaving alignToMineral abort = " + abort + "\r\n");
+    }
+
+    private void initImu() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -108,73 +164,35 @@ public class TestAuton extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
         logMessage("imu init complete\r\n");
-
-        if (opModeIsActive() && !abort && !detector.getAligned()) {
-            int dir = 0;
-            while (opModeIsActive() && !abort && !detector.isFound()) {
-                float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                telemetry.addData("currentAngle:", currentAngle);
-                telemetry.update();
-                if (dir == 0 && currentAngle < 35) {
-                    driveStyle.setDriveValues(.5, -.5);
-                } else {
-                    dir = 1;
-                    if (currentAngle > -35) {
-                        driveStyle.setDriveValues(-.5, .5);
-                    } else {
-                        abort = true;
-                    }
-                }
-            }
-        }
-        logMessage("Scanning complete\r\n");
-
-        telemetry.addLine().addData("Finished scanning abort is ", abort);
-        telemetry.update();
-        driveStyle.stop();
-
-        if (opModeIsActive() && detector.isFound()) {
-            initialMineralAngle = detector.getXPosition();
-            telemetry.addData("detector X Position:", initialMineralAngle);
-            while (!detector.getAligned()) {
-
-                if (initialMineralAngle < 290) {
-                    driveStyle.setDriveValues(DRIVE_MOTOR_MAX, -DRIVE_MOTOR_MAX);
-                } else if (initialMineralAngle > 350) {
-                    driveStyle.setDriveValues(-DRIVE_MOTOR_MAX, DRIVE_MOTOR_MAX);
-                }
-            }
-            driveStyle.setDriveValues(-.6, -.6);
-            sleep(500);
-
-        }
-
-        logMessage("Leaving alignToMineral abort = " + abort + "\r\n");
     }
 
     private void driveToDepot() {
-
+        int driveTime = 1250;
         float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        logMessage("Current Angle: " + currentAngle);
         if (currentAngle > 10) {
+            mySound.play(beepId,1,1,1,0,1);
             logMessage("Left of Depot\r\n");
             driveStyle.setDriveValues(.5, -.5);
-            while (currentAngle > 170) {
+            while (currentAngle > -40) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
             }
             driveStyle.setDriveValues(-.3, -.3);
-            sleep(250);
+            sleep(driveTime);
         } else if (currentAngle < -10) {
+            mySound.play(beepId,1,1,1,0,1);
+            mySound.play(beepId,1,1,1,0,1);
             logMessage("Right of Depot\r\n");
             driveStyle.setDriveValues(-.5, .5);
             while (currentAngle < 25) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
             }
             driveStyle.setDriveValues(-.3, -.3);
-            sleep(250);
+            sleep(driveTime);
         } else {
             logMessage("Aligned with Depot");
             driveStyle.setDriveValues(-.3, -.3);
-            sleep(250);
+            sleep(driveTime);
         }
 
         logMessage("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
