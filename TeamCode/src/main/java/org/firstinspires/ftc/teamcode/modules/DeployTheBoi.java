@@ -21,7 +21,7 @@ public class DeployTheBoi {
     }
 
     public void doTheThing() {
-        deploymentServo.setPosition(.8);
+        deploymentServo.setPosition(-.8);
     }
 
     public void stopDoingThing() {
@@ -29,7 +29,7 @@ public class DeployTheBoi {
     }
 
     public void sweep() {
-        double pos = deploymentServo.getPosition() + .05;
+        double pos = deploymentServo.getPosition() - .05;
         if (pos > 1) {
             pos=0;
         }

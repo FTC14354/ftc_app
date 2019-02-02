@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.modules.DeployTheBoi;
 @TeleOp(name = "PrimaryTeleOpMode", group = "TeleOp opmode")
 public class Teleop extends OpMode {
     static final double LIFT_MAX_POWER = 0.8;
-    static final double INCREMENT = 0.05;     // amount to ramp motor each CYCLE_MS cycle
+    static final double INCREMENT = 0.5;     // amount to ramp motor each CYCLE_MS cycle
     double leftRampedPower = 0;
     double rightRampedPower = 0;
     boolean rampUp = false;
@@ -26,7 +26,7 @@ public class Teleop extends OpMode {
     private DriveStyle driveStyle = null;
     private boolean isLiftRunning = false;
     private Intake intake;
-    private CRServo intakeServo;
+//    private CRServo intakeServo;
     private DeployTheBoi boiDeployer;
     private static final double STEP_SIZE = 0.02;
     //    private static final double SHOULDER_STEP_SIZE = .01;
@@ -140,31 +140,21 @@ public class Teleop extends OpMode {
         rightPower = Range.clip(drive - turn, -1.0, 1.0);
 
         if (gamepad1.right_trigger > .1) {
-            intakeServo.setDirection(Direction.FORWARD);
-            intakeServo.setPower(.3);
+//            intakeServo.setDirection(Direction.FORWARD);
+//            intakeServo.setPower(.3);
 
 
         } else if (gamepad1.left_trigger > 1) {
-            intakeServo.setDirection(Direction.REVERSE);
-            intakeServo.setPower(.3);
+//            intakeServo.setDirection(Direction.REVERSE);
+//            intakeServo.setPower(.3);
         }
 
         if (gamepad2.left_trigger > 0.1) {
 
-            if (leftRampedPower < leftPower) {
-                leftRampedPower += INCREMENT;
-            } else if (leftRampedPower > leftPower) {
-                leftRampedPower -= INCREMENT;
-            }
-            if (rightRampedPower < rightPower) {
-                rightRampedPower += INCREMENT;
-            } else if (rightRampedPower > rightPower) {
-                rightRampedPower -= INCREMENT;
-            }
-        } else {
-            leftRampedPower = leftPower;
-            rightRampedPower = rightPower;
+            leftPower = Range.clip(drive + turn, - 0.7, 0.7);
+            rightPower = Range.clip(drive - turn, -0.7, 0.7);
         }
+
         telemetry.addData("Shoulder", (shoulderMotor.getCurrentPosition()));
         telemetry.addData("Right Motor Power", "%5.2f", rightRampedPower);
         telemetry.addData("Left Motor Power", "%5.2f", leftRampedPower);

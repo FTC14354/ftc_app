@@ -27,8 +27,8 @@ import android.util.Log;
 
 import java.io.File;
 
-@Autonomous(name = "Test1Auton", group = "Auton opmode")
-public class TestAuton extends LinearOpMode {
+@Autonomous(name = "Test2Auton", group = "Auton opmode")
+public class TESTtestAuton extends LinearOpMode {
     private static final String TELEMETRY_TAG = "Telemetry";
     private SoundPool mySound;
     private int beepId;
@@ -69,17 +69,17 @@ public class TestAuton extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 //        lowerFromLander();
-
-        GoldAlignDetector detector = initMineralDetector();
-
-        alignToMineral(detector);
-//        initImu();
-
-        driveToDepot();
-
-//        deployTheBoi();
 //
-//        parkInCrater();
+//        GoldAlignDetector detector = initMineralDetector();
+//
+//        alignToMineral(detector);
+////        initImu();
+//
+        driveToDepot();
+//
+//        deployTheBoi();
+////
+////        parkInCrater();
     }
 
     private GoldAlignDetector initMineralDetector() {
@@ -167,35 +167,10 @@ public class TestAuton extends LinearOpMode {
     }
 
     private void driveToDepot() {
-        int driveTime = 1250;
-        float currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-        logMessage("Current Angle: " + currentAngle);
-        if (currentAngle > 10) {
-            mySound.play(beepId,1,1,1,0,1);
-            logMessage("Left of Depot\r\n");
-            driveStyle.driveToPosition(1919);
-            while (currentAngle > -40) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-            }
-            driveStyle.setDriveValues(-.3, -.3);
-            sleep(driveTime);
-        } else if (currentAngle < -10) {
-            mySound.play(beepId,1,1,1,0,1);
-            mySound.play(beepId,1,1,1,0,1);
-            logMessage("Right of Depot\r\n");
-            driveStyle.setDriveValues(-.5, .5);
-            while (currentAngle < 25) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-            }
-            driveStyle.driveToPosition(1963);
-
-        } else {
-            logMessage("Aligned with Depot");
-            driveStyle.driveToPosition(1676);
-
-        }
-
-        logMessage("Drive encoder: " + driveStyle.getEncoderValue() + "\r\n");
+        driveStyle.driveToPosition(1000);
+        driveStyle.setDriveValues(.5, -.5);
+        sleep(400);
+        driveStyle.driveToPosition(1000);
     }
 
     private void deployTheBoi() {
@@ -217,9 +192,7 @@ public class TestAuton extends LinearOpMode {
     }
 
     public void parkInCrater() {
-driveStyle.setDriveValues(-.5, .5);
-sleep(300);
-driveStyle.driveToPosition(-4000);
+
     }
 }
 
